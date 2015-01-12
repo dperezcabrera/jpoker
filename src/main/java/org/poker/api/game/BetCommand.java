@@ -1,0 +1,61 @@
+/* 
+ * Copyright (C) 2015 David Perez Cabrera
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.poker.api.game;
+
+
+import net.jcip.annotations.NotThreadSafe;
+import org.poker.api.game.TexasHoldEmUtil.BetCommandType;
+import org.util.exceptions.ExceptionUtil;
+
+/**
+ *
+ * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ */
+@NotThreadSafe
+public class BetCommand {
+
+    private final BetCommandType type;
+    private long chips;
+
+    public BetCommand(BetCommandType type, long chips) {
+        ExceptionUtil.checkNullArgument(type, "type");
+        ExceptionUtil.checkMinValueArgument(chips, 0L, "chips");
+        this.type = type;
+        this.chips = chips;
+    }
+
+    public BetCommand(BetCommandType type) {
+        this(type, 0);
+    }
+
+    public BetCommandType getType() {
+        return type;
+    }
+
+    public long getChips() {
+        return chips;
+    }
+
+    public void setChips(long chips) {
+        this.chips = chips;
+    }
+
+    @Override
+    public String toString() {
+        return "{class:'BetCommand', type:'" + type + "', chips:" + chips + '}';
+    }
+}
