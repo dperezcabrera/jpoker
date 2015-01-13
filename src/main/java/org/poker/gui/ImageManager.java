@@ -17,8 +17,6 @@
 package org.poker.gui;
 
 import java.awt.Image;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +36,7 @@ public enum ImageManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageManager.class);
     
-    public static final String IMAGES_PATH = "src/main/resources/images/";
+    public static final String IMAGES_PATH = "/images/";
     private final Map<String, Image> images = new HashMap<>();
 
     private ImageManager() {
@@ -48,7 +46,7 @@ public enum ImageManager {
         Image image = images.get(imageFile);
         if (image == null) {
             try {
-                image = ImageIO.read(new BufferedInputStream(new FileInputStream(imageFile)));
+                image = ImageIO.read(getClass().getResource(imageFile));
                 images.put(imageFile, image);
             } catch (IOException ex) {
                 LOGGER.error("getImage \"" + imageFile + "\"", ex);
