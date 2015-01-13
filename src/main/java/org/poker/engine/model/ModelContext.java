@@ -204,7 +204,7 @@ public class ModelContext {
         int i = 0;
         while (i < numCards && added) {
             added = gameInfo.addCommunityCard(deck.obtainCard());
-            if (added){
+            if (added) {
                 i++;
             }
         }

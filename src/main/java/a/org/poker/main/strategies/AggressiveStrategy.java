@@ -65,7 +65,7 @@ public class AggressiveStrategy implements IStrategy {
 
     @Override
     public String toString() {
-        return "{AgresivePlayerStrategy-" + name + '}';
+        return String.join("{AgresivePlayerStrategy-", name, "}");
     }
 
     @Override

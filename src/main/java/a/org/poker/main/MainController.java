@@ -33,7 +33,7 @@ import org.poker.gui.TexasHoldEmView;
  */
 public final class MainController {
 
-    private static final int PLAYERS = 2;
+    private static final int PLAYERS = 10;
 
     private MainController() {
     }

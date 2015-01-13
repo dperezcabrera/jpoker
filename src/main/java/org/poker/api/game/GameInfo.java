@@ -114,7 +114,7 @@ public class GameInfo<P extends PlayerInfo> {
 
     public boolean addCommunityCard(Card card) {
         boolean result = false;
-        if (communityCards.size() < COMMUNITY_CARDS){
+        if (communityCards.size() < COMMUNITY_CARDS) {
             result = communityCards.add(card);
         }
         return result;
@@ -126,6 +126,6 @@ public class GameInfo<P extends PlayerInfo> {
 
     @Override
     public String toString() {
-        return "{class:'GameInfo', round:" + round + ", dealer:" + dealer + ((playerTurn < 0)? "": (", playerTurn:" + playerTurn))+ ", gameState:'" + gameState + "', communityCards:" + communityCards + ", settings:" + settings + ", players:" + players + '}';
+        return "{class:'GameInfo', round:" + round + ", dealer:" + dealer + ((playerTurn < 0) ? "" : (", playerTurn:" + playerTurn)) + ", gameState:'" + gameState + "', communityCards:" + communityCards + ", settings:" + settings + ", players:" + players + '}';
     }
 }

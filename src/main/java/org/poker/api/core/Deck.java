@@ -62,6 +62,6 @@ public class Deck {
 
     @Override
     public String toString() {
-        return "{class:'Deck', index:" + index + ", cards:" + cards  + '}';
+        return String.join("{class:'Deck', index:" , Integer.toString(index), ", cards:" , cards.toString() , "'");
     }
 }

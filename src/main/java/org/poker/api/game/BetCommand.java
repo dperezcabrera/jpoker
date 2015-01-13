@@ -16,7 +16,6 @@
  */
 package org.poker.api.game;
 
-
 import net.jcip.annotations.NotThreadSafe;
 import org.poker.api.game.TexasHoldEmUtil.BetCommandType;
 import org.util.exceptions.ExceptionUtil;
@@ -56,6 +55,6 @@ public class BetCommand {
 
     @Override
     public String toString() {
-        return "{class:'BetCommand', type:'" + type + "', chips:" + chips + '}';
+        return String.join("{class:'BetCommand', type:'", type.toString(), "', chips:", Long.toString(chips), "}");
     }
 }

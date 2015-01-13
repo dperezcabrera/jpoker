@@ -66,7 +66,7 @@ public class SlowlyStrategy implements IStrategy {
 
     @Override
     public String toString() {
-        return "{SlowlyStrategy-" + name + '}';
+        return String.join("{SlowlyStrategy-", name , "}");
     }
 
     @Override

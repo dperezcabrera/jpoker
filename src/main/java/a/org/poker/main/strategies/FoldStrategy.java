@@ -58,7 +58,7 @@ public class FoldStrategy implements IStrategy {
 
     @Override
     public String toString() {
-        return "{Fold-" + name + '}';
+        return String.join("{Fold-", name, "}");
     }
 
     @Override

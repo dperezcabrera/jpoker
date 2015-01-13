@@ -31,6 +31,7 @@ import org.poker.api.game.TexasHoldEmUtil.BetCommandType;
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
 public class RandomStrategy implements IStrategy {
+
     private static final Random RAND = new Random();
     private final String name;
     private double aggressivity = 0.5 + RAND.nextDouble() / 2;
@@ -92,7 +93,7 @@ public class RandomStrategy implements IStrategy {
 
     @Override
     public String toString() {
-        return "{RandomStrategy-" + name + '}';
+        return String.join("{RandomStrategy-", name, "}");
     }
 
     @Override

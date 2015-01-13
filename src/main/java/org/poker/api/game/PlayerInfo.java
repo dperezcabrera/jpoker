@@ -37,10 +37,10 @@ public class PlayerInfo {
     public PlayerInfo() {
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return state.isActive();
     }
-    
+
     public String getName() {
         return name;
     }
@@ -105,6 +105,6 @@ public class PlayerInfo {
 
     @Override
     public String toString() {
-        return "{class:'PlayerInfo', name:'" + name + "', chips:" + chips + ", bet:" + bet + ", cards:[" + cards[0] +", "+cards[1] + "], state:'" + state + "', errors:" + errors + '}';
+        return "{class:'PlayerInfo', name:'" + name + "', chips:" + chips + ", bet:" + bet + ", cards:[" + cards[0] + ", " + cards[1] + "], state:'" + state + "', errors:" + errors + '}';
     }
 }
