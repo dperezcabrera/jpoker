@@ -39,7 +39,6 @@ public final class MainController {
     }
 
     public static void main(String[] args) throws InterruptedException, GameException {
-        System.setProperty("logback.configurationFile", "logback.xml");
         IStrategy strategyMain = new RandomStrategy("0");
         TexasHoldEmView texasHoldEmView = new TexasHoldEmView(strategyMain);
         texasHoldEmView.setVisible(true);
