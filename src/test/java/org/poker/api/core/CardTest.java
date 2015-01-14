@@ -115,13 +115,4 @@ public class CardTest {
             i++;
         }
     }
-
-//    @Test
-//    public void testToString() {
-//        System.out.println("toString");
-//        String[] expResult = {"2♠", "2♥", "2♦", "2♣", "3♠", "3♥", "3♦", "3♣", "4♠", "4♥", "4♦", "4♣", "5♠", "5♥", "5♦", "5♣", "6♠", "6♥", "6♦", "6♣", "7♠", "7♥", "7♦", "7♣", "8♠", "8♥", "8♦", "8♣", "9♠", "9♥", "9♦", "9♣", "T♠", "T♥", "T♦", "T♣", "J♠", "J♥", "J♦", "J♣", "Q♠", "Q♥", "Q♦", "Q♣", "K♠", "K♥", "K♦", "K♣", "A♠", "A♥", "A♦", "A♣"};
-//        for (Card card : getAllCards()) {
-//            assertEquals(expResult[card.hashCode()], card.toString());
-//        }
-//    }
 }

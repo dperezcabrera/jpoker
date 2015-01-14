@@ -43,18 +43,6 @@ public class DeckTest {
     }
 
     /**
-     * Test of shuffle method, of class Deck.
-     */
-    @Test
-    public void testShuffle() {
-        System.out.println("shuffle");
-        Deck instance = new Deck();
-        instance.shuffle();
-        // TODO review the generated test code and remove the default call to fail.
-        //fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getAllCards method, of class Deck.
      */
    @Test
