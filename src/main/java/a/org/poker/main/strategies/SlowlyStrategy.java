@@ -53,24 +53,9 @@ public class SlowlyStrategy implements IStrategy {
         }
         return new BetCommand(TexasHoldEmUtil.BetCommandType.FOLD);
     }
-
-    @Override
-    public void updateState(GameInfo<PlayerInfo> state) {
-        // No needed
-    }
-
-    @Override
-    public void onPlayerCommand(String player, BetCommand state) {
-        // No needed
-    }
-
+    
     @Override
     public String toString() {
         return String.join("{SlowlyStrategy-", name , "}");
-    }
-
-    @Override
-    public void check(List<Card> communityCards) {
-        // No needed
     }
 }

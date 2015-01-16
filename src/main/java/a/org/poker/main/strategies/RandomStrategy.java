@@ -87,11 +87,6 @@ public class RandomStrategy implements IStrategy {
     }
 
     @Override
-    public void onPlayerCommand(String player, BetCommand bet) {
-        // No needed
-    }
-
-    @Override
     public String toString() {
         return String.join("{RandomStrategy-", name, "}");
     }

@@ -29,9 +29,9 @@ public interface IStrategy {
 
     public BetCommand getCommand(GameInfo<PlayerInfo> state);
 
-    public void updateState(GameInfo<PlayerInfo> state);
+    public default void updateState(GameInfo<PlayerInfo> state){}
 
-    public void check(List<Card> communityCards);
+    public default void check(List<Card> communityCards){}
 
-    public void onPlayerCommand(String player, BetCommand betCommand);
+    public default void onPlayerCommand(String player, BetCommand betCommand){}
 }

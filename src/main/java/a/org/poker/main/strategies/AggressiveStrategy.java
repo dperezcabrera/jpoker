@@ -54,22 +54,7 @@ public class AggressiveStrategy implements IStrategy {
     }
 
     @Override
-    public void updateState(GameInfo<PlayerInfo> state) {
-        // No needed
-    }
-
-    @Override
-    public void onPlayerCommand(String player, BetCommand state) {
-        // No needed
-    }
-
-    @Override
     public String toString() {
         return String.join("{AgresivePlayerStrategy-", name, "}");
-    }
-
-    @Override
-    public void check(List<Card> communityCards) {
-        // No needed
     }
 }
