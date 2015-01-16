@@ -16,10 +16,8 @@
  */
 package a.org.poker.main.strategies;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.poker.api.core.Card;
 import org.poker.api.game.BetCommand;
 import org.poker.api.game.GameInfo;
 import org.poker.api.game.IStrategy;
