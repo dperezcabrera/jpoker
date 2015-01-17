@@ -42,7 +42,7 @@ public final class MainController {
         IStrategy strategyMain = new RandomStrategy("0");
         TexasHoldEmView texasHoldEmView = new TexasHoldEmView(strategyMain);
         texasHoldEmView.setVisible(true);
-        strategyMain = texasHoldEmView.getIStrategy();
+        strategyMain = texasHoldEmView.getStrategy();
         List<IStrategy> strategies = new ArrayList<>();
         strategies.add(strategyMain);
         for (int i = 1; i < PLAYERS; i++) {

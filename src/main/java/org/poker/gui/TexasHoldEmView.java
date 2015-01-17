@@ -40,7 +40,7 @@ public class TexasHoldEmView extends javax.swing.JFrame {
         jTablePanel.setStrategy(delegate);
     }
 
-    public IStrategy getIStrategy() {
+    public IStrategy getStrategy() {
         return jTablePanel;
     }
 
