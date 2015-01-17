@@ -18,6 +18,7 @@ package org.poker.engine.states;
 
 import net.jcip.annotations.ThreadSafe;
 import org.poker.api.game.TexasHoldEmUtil.GameState;
+import static org.poker.api.game.TexasHoldEmUtil.PlayerState.READY;
 import org.poker.engine.model.ModelContext;
 import org.poker.engine.model.ModelUtil;
 import org.util.statemachine.IState;
@@ -54,6 +55,7 @@ public class CheckState implements IState<ModelContext> {
         }
         model.setGameState(GAME_STATE[indexGameState+1]);
         model.setBets(0);
+        model.getPlayers().stream().filter(p -> p.isActive()).forEach(p-> p.setState(READY));
         model.setPlayerTurn(ModelUtil.nextPlayer(model, model.getDealer()));
         model.setLastBetCommand(null);
         model.setLastPlayerBet(null);
