@@ -64,10 +64,7 @@ public final class MainController {
                 controller.addStrategy(strategy);
             }
             controller.start();
-            synchronized (controller) {
-                controller.wait();
-            }
-            Thread.sleep(500);
+            controller.waitFinish();
         }
     }
 }

@@ -27,4 +27,6 @@ public interface IGameController {
     public boolean addStrategy(IStrategy strategy);
 
     public void start() throws GameException;
+
+    public void waitFinish();
 }

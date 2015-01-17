@@ -73,6 +73,7 @@ public class GameController implements IGameController, Runnable {
     private final IGameTimer timer;
     private Settings settings;
     private ExecutorService executors;
+    private boolean finish;
 
     public GameController() {
         timer = new GameTimer(SYSTEM_CONTROLLER, buildExecutor(DISPATCHER_THREADS));
@@ -157,6 +158,7 @@ public class GameController implements IGameController, Runnable {
         timer.setTime(settings.getTime());
         playersByName.stream().forEach(stateMachineConnector::addPlayer);
         executors.execute(timer);
+        finish = false;
         new Thread(this).start();
     }
 
@@ -175,6 +177,18 @@ public class GameController implements IGameController, Runnable {
         } catch (InterruptedException ex) {
             LOGGER.error("Error intentando eliminar cerrar todos los hilos", ex);
         }
-        notify();
+        finish = true;
+        notifyAll();
+    }
+
+    @Override
+    public synchronized void waitFinish() {
+        if (!finish) {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                LOGGER.error("Esperando el final del juego", ex);
+            }
+        }
     }
 }
