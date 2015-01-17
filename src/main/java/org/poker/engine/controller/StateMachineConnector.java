@@ -129,12 +129,12 @@ public class StateMachineConnector {
     }
 
     private void notifyBetCommand() {
-        String playerTurn = model.getPlayerTurnName();
+        String playerTurn = model.getLastPlayerBet().getName();
         BetCommand lbc = model.getLastBetCommand();
         LOGGER.debug("notifyBetCommand -> {}: {}", playerTurn, lbc);
         for (String playerName : playersDispatcher.keySet()) {
             playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, model.getLastPlayerBet().getName(), new BetCommand(lbc.getType(), lbc.getChips())));
+                    new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, playerTurn, new BetCommand(lbc.getType(), lbc.getChips())));
         }
     }
 
