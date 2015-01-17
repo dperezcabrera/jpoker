@@ -66,6 +66,7 @@ public class RandomStrategy implements IStrategy {
         long maxBet = getMaxBet(state);
         long chips = ownInfo.getChips();
         BetCommand result;
+        maxBet = Math.min(maxBet, state.getPlayers().stream().mapToLong(p -> p.getBet()).sum());
         if (minBet > maxBet) {
             result = new BetCommand(BetCommandType.FOLD);
         } else if (maxBet >= chips) {
