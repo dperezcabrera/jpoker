@@ -22,7 +22,6 @@ import org.poker.api.core.Deck;
 import org.poker.api.game.BetCommand;
 import org.poker.api.game.Settings;
 import org.poker.api.game.TexasHoldEmUtil;
-import static org.poker.api.game.TexasHoldEmUtil.MIN_PLAYERS;
 import org.poker.dispatcher.GameEvent;
 import org.poker.dispatcher.IGameEventDispatcher;
 import static org.poker.engine.controller.GameController.SYSTEM_CONTROLLER;
@@ -205,8 +204,8 @@ public class StateMachineConnector {
 
         // checkState transitions
         sm.addTransition(checkState, showDownState, c -> c.getGameState() == TexasHoldEmUtil.GameState.SHOWDOWN);
-        sm.addTransition(checkState, checkState, c -> c.getPlayersAllIn() > 0 && c.getActivePlayers() < MIN_PLAYERS);
-        sm.setDefaultTransition(checkState, betRoundState);
+        sm.addTransition(checkState, betRoundState,  c -> c.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
+        sm.setDefaultTransition(checkState, checkState);
 
         // betWinnerState transitions
         sm.setDefaultTransition(winnerState, endHandState);
