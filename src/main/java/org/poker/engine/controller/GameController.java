@@ -109,9 +109,9 @@ public class GameController implements IGameController, Runnable {
         playerProcessorsMap.put(CHECK_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.check((List<Card>) event.getPayload()));
         playerProcessorsMap.put(GET_COMMAND_PLAYER_EVENT_TYPE, (strategy, event) -> {
             GameInfo<PlayerInfo> gi = (GameInfo<PlayerInfo>) event.getPayload();
+            String playerTurn = gi.getPlayers().get(gi.getPlayerTurn()).getName();
             BetCommand command = strategy.getCommand(gi);
-            PlayerInfo playerTurn = gi.getPlayers().get(gi.getPlayerTurn());
-            connectorDispatcher.dispatch(new GameEvent(BET_COMMAND_EVENT_TYPE, playerTurn.getName(), command));
+            connectorDispatcher.dispatch(new GameEvent(BET_COMMAND_EVENT_TYPE, playerTurn, command));
         });
         return playerProcessorsMap;
     }
