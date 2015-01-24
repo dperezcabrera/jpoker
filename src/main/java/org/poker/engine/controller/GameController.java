@@ -145,7 +145,7 @@ public class GameController implements IGameController, Runnable {
         LOGGER.debug("start");
         check(settings != null, "No se ha establecido una configuración.");
         check(players.size() > 1, "No se han agregado un número suficiente de jugadores.");
-        check(players.size() < settings.getMaxPlayers(), "El número de jugadores excede el máximo permitido por configuración.");
+        check(players.size() <= settings.getMaxPlayers(), "El número de jugadores excede el máximo permitido por configuración.");
         check(settings.getMaxErrors() > 0, "El número de máximo de errores debe ser mayor que '0'.");
         check(settings.getMaxRounds() > 0, "El número de máximo de rondas debe ser mayor que '0'.");
         check(settings.getRounds4IncrementBlind()> 1, "El número de rondas hasta incrementar las ciegas debe ser mayor que '1'.");
