@@ -119,7 +119,7 @@ public class GameController implements IGameController, Runnable {
 
     @Override
     public void setSettings(Settings settings) {
-        this.settings = settings;
+        this.settings = new Settings(settings);
     }
 
     @Override
