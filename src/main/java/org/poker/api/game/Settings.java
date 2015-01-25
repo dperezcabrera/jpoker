@@ -43,6 +43,7 @@ public class Settings {
         this.playerChip = s.playerChip;
         this.smallBind = s.smallBind;
         this.maxRounds = s.maxRounds;
+        this.rounds4IncrementBlind = s.rounds4IncrementBlind;
     }
 
     public int getMaxErrors() {
