@@ -10,6 +10,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+	<coveralls-maven-plugin-version>2.2.0</coveralls-maven-plugin-version>
+	<jacoco-maven-plugin-version>0.7.5.201505241946</jacoco-maven-plugin-version>
         <junit.version>4.11</junit.version>
         <assertj.version>1.6.1</assertj.version>
         <cucumber.version>1.2.0</cucumber.version>
