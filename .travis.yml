@@ -1,18 +1,14 @@
 install:
-- export GOPATH=$HOME/gopath
-- export PATH=$PATH:$GOPATH/bin
-- go get github.com/dperezcabrera/jpoker
+- git clone https://github.com/dperezcabrera/jpoker.git
 language: java
 jdk:
 - oraclejdk8
+mvn install -DskipTests=false
 cache:
   directories:
   - "$HOME/.m2"
 after_success:
 - mvn jacoco:report coveralls:jacoco
-- if [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then mvn deploy --settings settings.xml
-  -DperformRelease=true -DskipTests=true; else echo 'Pull request, skipping deploy.';
-  fi
 notifications:
   email:
   - dperezcabrera@gmail.com
