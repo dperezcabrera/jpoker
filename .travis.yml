@@ -9,8 +9,7 @@ cache:
   directories:
   - "$HOME/.m2"
 after_success:
-- mvn jacoco:report coveralls:jacoco
-- mvn clean -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID cobertura:cobertura coveralls:report
+- mvn clean test jacoco:report coveralls:jacoco -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID
 
 notifications:
   email:
