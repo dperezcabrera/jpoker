@@ -1,4 +1,6 @@
 install:
+- export GOPATH=$HOME/gopath
+- export PATH=$PATH:$GOPATH/bin
 - go get github.com/dperezcabrera/jpoker
 language: java
 jdk:
