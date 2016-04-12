@@ -10,7 +10,7 @@ cache:
   - "$HOME/.m2"
 after_success:
 - mvn jacoco:report coveralls:jacoco
-- mvn coveralls:report
+- mvn clean -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID cobertura:cobertura coveralls:report
 
 notifications:
   email:
