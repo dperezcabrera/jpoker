@@ -14,3 +14,8 @@ after_success:
 notifications:
   email:
   - dperezcabrera@gmail.com
+env:
+  global:
+    - GIT_DEPENDENCIES=""
+    - GH_USERNAME=dperezcabrera
+    - GH_REPO=dperezcabrera/jpoker
