@@ -120,46 +120,38 @@
                     <mainClass>${main.class}</mainClass>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.eluder.coveralls</groupId>
-				<artifactId>coveralls-maven-plugin</artifactId>
-				<version>${coveralls-maven-plugin-version}</version>
-				<configuration>
-					<jacocoFile>${project.reporting.outputDirectory}/jacoco-ut/jacoco.xml</jacocoFile>
-					<sourceEncoding>UTF8</sourceEncoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin-version}</version>
-				<executions>
-					<execution>
-						<id>default-prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the name of the property containing the settings for JaCoCo 
-								runtime agent. -->
-							<propertyName>surefireArgLine</propertyName>
-						</configuration>
-					</execution>
-					<execution>
-						<id>default-report</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-check</id>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+		<artifactId>coveralls-maven-plugin</artifactId>
+		<version>${coveralls-maven-plugin-version}</version>
+		<configuration>
+		    <jacocoFile>${project.reporting.outputDirectory}/jacoco-ut/jacoco.xml</jacocoFile>
+		    <sourceEncoding>UTF8</sourceEncoding>
+		</configuration>
+            </plugin>
+            <plugin>
+		<groupId>org.jacoco</groupId>
+		<artifactId>jacoco-maven-plugin</artifactId>
+		<version>${jacoco-maven-plugin-version}</version>
+		<executions>
+		    <execution>
+		        <id>default-prepare-agent</id>
+		        <goals>
+                            <goal>prepare-agent</goal>
+		        </goals>
+	                <configuration>
+		            <propertyName>surefireArgLine</propertyName>
+		        </configuration>
+		    </execution>
+		    <execution>
+			<id>default-report</id>
+			<phase>prepare-package</phase>
+			<goals>
+			    <goal>report</goal>
+		        </goals>
+		    </execution>
+	        </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
