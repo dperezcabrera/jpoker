@@ -10,6 +10,8 @@ cache:
   - "$HOME/.m2"
 after_success:
 - mvn jacoco:report coveralls:jacoco
+- coveralls
+
 notifications:
   email:
   - dperezcabrera@gmail.com
