@@ -3,7 +3,8 @@ install:
 language: java
 jdk:
 - oraclejdk8
-mvn install -DskipTests=false
+sudo: false
+script: mvn clean verify
 cache:
   directories:
   - "$HOME/.m2"
