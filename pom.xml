@@ -125,8 +125,8 @@
 		<artifactId>coveralls-maven-plugin</artifactId>
 		<version>${coveralls-maven-plugin-version}</version>
 		<configuration>
-		    <jacocoFile>${project.reporting.outputDirectory}/jacoco-ut/jacoco.xml</jacocoFile>
 		    <sourceEncoding>UTF8</sourceEncoding>
+		    <repoToken>${env.coveralls_repo_token}</repoToken>
 		</configuration>
             </plugin>
             <plugin>
@@ -138,16 +138,6 @@
 		        <id>default-prepare-agent</id>
 		        <goals>
                             <goal>prepare-agent</goal>
-		        </goals>
-	                <configuration>
-		            <propertyName>surefireArgLine</propertyName>
-		        </configuration>
-		    </execution>
-		    <execution>
-			<id>default-report</id>
-			<phase>prepare-package</phase>
-			<goals>
-			    <goal>report</goal>
 		        </goals>
 		    </execution>
 	        </executions>
