@@ -1,0 +1,16 @@
+install:
+- go get github.com/dperezcabrera/jpoker
+language: java
+jdk:
+- oraclejdk8
+cache:
+  directories:
+  - "$HOME/.m2"
+after_success:
+- mvn jacoco:report coveralls:jacoco
+- if [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then mvn deploy --settings settings.xml
+  -DperformRelease=true -DskipTests=true; else echo 'Pull request, skipping deploy.';
+  fi
+notifications:
+  email:
+  - dperezcabrera@gmail.com
