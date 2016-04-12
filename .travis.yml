@@ -10,7 +10,7 @@ cache:
   - "$HOME/.m2"
 after_success:
 - mvn jacoco:report coveralls:jacoco
-- coveralls
+- mvn coveralls:report
 
 notifications:
   email:
