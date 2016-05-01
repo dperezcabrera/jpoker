@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 @ThreadSafe
 public class GameTimer implements IGameTimer {

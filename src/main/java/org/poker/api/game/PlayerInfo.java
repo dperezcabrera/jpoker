@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  */
 package org.poker.api.game;
 
-import java.io.Serializable;
 import net.jcip.annotations.NotThreadSafe;
 import org.poker.api.core.Card;
 import org.poker.api.game.TexasHoldEmUtil.PlayerState;
@@ -24,10 +23,10 @@ import org.poker.api.game.TexasHoldEmUtil.PlayerState;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 @NotThreadSafe
-public class PlayerInfo implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class PlayerInfo {
     
     private String name;
     private long chips;

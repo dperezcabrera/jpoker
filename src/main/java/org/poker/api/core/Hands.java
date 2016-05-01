@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 David Perez Cabrera
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@ package org.poker.api.core;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public final class Hands {
+
     public static final int CARDS = 5;
 
     public enum Type {

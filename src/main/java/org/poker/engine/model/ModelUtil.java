@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import org.poker.api.game.TexasHoldEmUtil.PlayerState;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public final class ModelUtil {
 

@@ -19,6 +19,7 @@ package org.util.timer;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public interface IGameTimer extends Runnable {
 

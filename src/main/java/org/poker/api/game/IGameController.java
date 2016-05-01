@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import java.util.Map;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public interface IGameController {
 

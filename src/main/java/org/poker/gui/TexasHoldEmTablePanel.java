@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import static org.poker.gui.ImageManager.IMAGES_PATH;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrategy {
 
@@ -96,9 +97,6 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
     private int playerTurn = -1;
     private int dealer = 0;
     private int round = 0;
-
-    public TexasHoldEmTablePanel() {
-    }
 
     public void setStrategy(IStrategy delegate) {
         this.delegate = delegate;
@@ -290,12 +288,15 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
         repaint();
     }
 
+    private static boolean isActivePlayer(PlayerInfo p){
+        return p != null && (p.isActive() || p.getState() == PlayerState.ALL_IN);
+    }
+    
     private static int nextPlayerTurn(PlayerInfo[] players, BetCommandType[] bets, long maxBet, int currentPlayerTurn) {
         int i = (currentPlayerTurn + 1) % players.length;
         while (i != currentPlayerTurn) {
             if (players[i] != null && players[i].isActive() && (bets[i] == null || players[i].getBet() < maxBet)) {
-                long activePlayers = Arrays.stream(players).filter(p -> p != null && (p.isActive() || p.getState() == PlayerState.ALL_IN)).count();
-                if (activePlayers == 1) {
+                if (1 == Arrays.stream(players).filter(TexasHoldEmTablePanel::isActivePlayer).count()) {
                     return -1;
                 } else {
                     return i;
