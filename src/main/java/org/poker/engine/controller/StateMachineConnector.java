@@ -44,13 +44,13 @@ import org.util.statemachine.IStateTrigger;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
- * @since 1.0.0
+ * @since 1.0.0d
  */
 public class StateMachineConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachineConnector.class);
 
     private final StateMachine<PokerStates, ModelContext> texasStateMachine = buildStateMachine();
-    private final Map<String, IGameEventDispatcher> playersDispatcher;
+    private final Map<String, IGameEventDispatcher<PokerEventType>> playersDispatcher;
     final IGameTimer timer;
     ModelContext model;
     IGameEventDispatcher<ConnectorGameEventType> system;
@@ -58,7 +58,7 @@ public class StateMachineConnector {
     private long timeoutId = 0;
     private Map<String, Double> scores;
 
-    public StateMachineConnector(IGameTimer timer, Map<String, IGameEventDispatcher> playersDispatcher) {
+    public StateMachineConnector(IGameTimer timer, Map<String, IGameEventDispatcher<PokerEventType>> playersDispatcher) {
         this.playersDispatcher = playersDispatcher;
         this.timer = timer;
     }
@@ -129,7 +129,7 @@ public class StateMachineConnector {
         LOGGER.debug("notifyBetCommand -> {}: {}", playerTurn, lbc);
         playersDispatcher.entrySet().stream().forEach(entry
                 -> entry.getValue().dispatch(
-                    new GameEvent<>(PokerEventType.BET_COMMAND, model.getLastPlayerBet().getName(), new BetCommand(lbc.getType(), lbc.getChips()))));
+                    new GameEvent<>(PokerEventType.BET_COMMAND, playerTurn, new BetCommand(lbc.getType(), lbc.getChips()))));
     }
 
     private void notifyCheck() {
@@ -188,13 +188,14 @@ public class StateMachineConnector {
         final IStateTrigger<ModelContext> endHandTrigger = StateDecoratorBuilder.before(new EndHandTrigger(), () -> notifyEndHand());
         final IStateTrigger<ModelContext> endGameTrigger = StateDecoratorBuilder.after(new EndGameTrigger(), () -> notifyEndGame());
 
+        sm.setTrigger(PokerStates.INIT_HAND, initHandTrigger);
         sm.setTrigger(PokerStates.BET_ROUND, betRoundTrigger);
         sm.setTrigger(PokerStates.CHECK, checkTrigger);
-        sm.setTrigger(PokerStates.END_GAME, endGameTrigger);
-        sm.setTrigger(PokerStates.END_HAND, endHandTrigger);
-        sm.setTrigger(PokerStates.INIT_HAND, initHandTrigger);
-        sm.setTrigger(PokerStates.SHOWDOWN, showDownTrigger);
         sm.setTrigger(PokerStates.WINNER, winnerTrigger);
+        sm.setTrigger(PokerStates.SHOWDOWN, showDownTrigger);
+        sm.setTrigger(PokerStates.END_HAND, endHandTrigger);
+        sm.setTrigger(PokerStates.END_GAME, endGameTrigger);
+        
         
         sm.setInitState(PokerStates.INIT_HAND);
 

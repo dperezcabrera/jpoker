@@ -17,6 +17,7 @@
 package org.poker.engine.controller;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class GameController implements IGameController, Runnable {
     private static final int EXTRA_THREADS = 2;
     public static final String SYSTEM_CONTROLLER = "system";
    
-    private final Map<String, IGameEventDispatcher> players = new HashMap<>();
+    private final Map<String, IGameEventDispatcher<PokerEventType>> players = new HashMap<>();
     private final List<String> playersByName = new ArrayList<>();
     private final List<ExecutorService> subExecutors = new ArrayList<>();
     private final Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> playerProcessors;
@@ -68,7 +69,7 @@ public class GameController implements IGameController, Runnable {
         stateMachineConnector = new StateMachineConnector(timer, players);
         connectorDispatcher = new GameEventDispatcher<>(stateMachineConnector, buildConnectorProcessors(), buildExecutor(1), ConnectorGameEventType.EXIT);
         stateMachineConnector.setSystem(connectorDispatcher);
-        timer.setNotifier((timeoutId) -> connectorDispatcher.dispatch(new GameEvent<>(ConnectorGameEventType.TIMEOUT, SYSTEM_CONTROLLER, timeoutId)));
+        timer.setNotifier(timeoutId -> connectorDispatcher.dispatch(new GameEvent<>(ConnectorGameEventType.TIMEOUT, SYSTEM_CONTROLLER, timeoutId)));
         playerProcessors = buildPlayerProcessors();
     }
 
@@ -79,7 +80,7 @@ public class GameController implements IGameController, Runnable {
     }
 
     private static Map<ConnectorGameEventType, IGameEventProcessor<ConnectorGameEventType, StateMachineConnector>> buildConnectorProcessors() {
-        Map<ConnectorGameEventType, IGameEventProcessor<ConnectorGameEventType, StateMachineConnector>> connectorProcessorsMap = new HashMap<>();
+        Map<ConnectorGameEventType, IGameEventProcessor<ConnectorGameEventType, StateMachineConnector>> connectorProcessorsMap = new EnumMap<>(ConnectorGameEventType.class);
         connectorProcessorsMap.put(ConnectorGameEventType.CREATE_GAME, (connector, event) -> connector.createGame((Settings) event.getPayload()));
         connectorProcessorsMap.put(ConnectorGameEventType.ADD_PLAYER, (connector, event) -> connector.addPlayer(event.getSource()));
         connectorProcessorsMap.put(ConnectorGameEventType.INIT_GAME, (connector, event) -> connector.startGame());
@@ -89,7 +90,7 @@ public class GameController implements IGameController, Runnable {
     }
 
     private Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> buildPlayerProcessors() {
-        Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> playerProcessorsMap = new HashMap<>();
+        Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> playerProcessorsMap = new EnumMap<>(PokerEventType.class);
         playerProcessorsMap.put(PokerEventType.INIT_HAND, (strategy, event) -> strategy.initHand((GameInfo) event.getPayload()));
         playerProcessorsMap.put(PokerEventType.END_HAND, (strategy, event) -> strategy.endHand((GameInfo) event.getPayload()));
         playerProcessorsMap.put(PokerEventType.END_GAME, (strategy, event) -> strategy.endGame((Map<String, Double>) event.getPayload()));

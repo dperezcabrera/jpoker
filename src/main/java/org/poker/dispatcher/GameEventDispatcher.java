@@ -60,8 +60,6 @@ public class GameEventDispatcher<E extends Enum, T> implements IGameEventDispatc
         IGameEventProcessor<E, T> processor = processors.get(event.getType());
         if (processor != null) {
             executors.execute(() -> processor.process(target, event));
-        } else {
-            System.out.println("warn!!!! no hay procesador para el evento: "+event.getType());
         }
     }
 

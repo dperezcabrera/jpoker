@@ -34,7 +34,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 public class StateMachine<S extends Enum, T> {
 
-    private static final IStateTrigger<?> DEFAULT_TRIGGER = (c) -> true;
+    private static final IStateTrigger<?> DEFAULT_TRIGGER = c -> true;
     private S initState = null;
     private final Map<S, IStateTrigger<T>> triggersByState = new HashMap<>();
     private final Map<S, S> defaultTransition = new HashMap<>();
