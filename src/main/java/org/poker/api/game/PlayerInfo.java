@@ -16,6 +16,7 @@
  */
 package org.poker.api.game;
 
+import java.io.Serializable;
 import net.jcip.annotations.NotThreadSafe;
 import org.poker.api.core.Card;
 import org.poker.api.game.TexasHoldEmUtil.PlayerState;
@@ -25,12 +26,13 @@ import org.poker.api.game.TexasHoldEmUtil.PlayerState;
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
 @NotThreadSafe
-public class PlayerInfo {
-
+public class PlayerInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private String name;
     private long chips;
     private long bet;
-    private Card[] cards = new Card[TexasHoldEmUtil.PLAYER_CARDS];
+    private final Card[] cards = new Card[TexasHoldEmUtil.PLAYER_CARDS];
     private PlayerState state;
     private int errors;
 

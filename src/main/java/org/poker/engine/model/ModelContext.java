@@ -34,16 +34,18 @@ import org.poker.api.game.TexasHoldEmUtil.GameState;
  */
 public class ModelContext {
 
-    final GameInfo<PlayerEntity> gameInfo = new GameInfo<>();
-    final Map<String, PlayerEntity> playersByName;
-    int activePlayers;
-    long highBet;
-    Deck deck;
-    int playersAllIn;
-    BetCommand lastBetCommand;
-    PlayerEntity lastPlayerBet;
-    int bets = 0;
-
+    private final GameInfo<PlayerEntity> gameInfo = new GameInfo<>();
+    private final Map<String, PlayerEntity> playersByName;
+    private int activePlayers;
+    private long highBet;
+    private Deck deck;
+    private int playersAllIn;
+    private BetCommand lastBetCommand;
+    private PlayerEntity lastPlayerBet;
+    private int bets = 0;
+    private Map<String, Double> scores;
+    private List<PlayerEntity> allPlayers = new ArrayList<>(TexasHoldEmUtil.MAX_PLAYERS);
+    
     public ModelContext(Settings settings) {
         this.gameInfo.setSettings(settings);
         this.gameInfo.setPlayers(new ArrayList<>(TexasHoldEmUtil.MAX_PLAYERS));
@@ -76,13 +78,14 @@ public class ModelContext {
         player.setName(playerName);
         player.setChips(gameInfo.getSettings().getPlayerChip());
         this.playersByName.put(playerName, player);
+        this.allPlayers.add(player);
         return this.gameInfo.addPlayer(player);
     }
 
-    public boolean removePlayer(final String playerName) {
-        return gameInfo.removePlayer(playersByName.get(playerName));
+    public List<PlayerEntity> getAllPlayers() {
+        return new ArrayList<>(allPlayers);
     }
-
+    
     public long getHighBet() {
         return highBet;
     }
@@ -218,5 +221,13 @@ public class ModelContext {
     @Override
     public String toString() {
         return "{class:'ModelContext', gameInfo:" + gameInfo + ", activePlayers:" + activePlayers + ", highBet:" + highBet + ", deck:" + deck + ", playersAllIn:" + playersAllIn + ", lastBetCommand:" + lastBetCommand + ", lastPlayerBet:" + lastPlayerBet + ", bets:" + bets + '}';
+    }
+
+    public void setScores(Map<String, Double> scores) {
+        this.scores = scores;
+    }
+
+    public Map<String, Double> getScores() {
+        return new HashMap<>(scores);
     }
 }

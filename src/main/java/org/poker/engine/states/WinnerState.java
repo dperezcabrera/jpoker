@@ -46,8 +46,7 @@ public class WinnerState implements IState<ModelContext> {
                 .get()
                 .addChips(players
                         .stream()
-                        .mapToLong(p -> p.getBet())
-                        .sum());
+                        .mapToLong(p -> p.getBet()).sum());
         return true;
     }
 }

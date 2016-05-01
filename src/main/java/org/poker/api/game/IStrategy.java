@@ -17,6 +17,7 @@
 package org.poker.api.game;
 
 import java.util.List;
+import java.util.Map;
 import org.poker.api.core.Card;
 
 /**
@@ -27,11 +28,22 @@ public interface IStrategy {
 
     public String getName();
 
-    public BetCommand getCommand(GameInfo<PlayerInfo> state);
+    public default BetCommand getCommand(GameInfo<PlayerInfo> state) {
+        return null;
+    }
 
-    public default void updateState(GameInfo<PlayerInfo> state){}
+    public default void initHand(GameInfo<PlayerInfo> state) {
+    }
+    
+    public default void endHand(GameInfo<PlayerInfo> state) {
+    }
+    
+    public default void endGame(Map<String, Double> scores) {
+    }
 
-    public default void check(List<Card> communityCards){}
+    public default void check(List<Card> communityCards) {
+    }
 
-    public default void onPlayerCommand(String player, BetCommand betCommand){}
+    public default void onPlayerCommand(String player, BetCommand betCommand) {
+    }
 }

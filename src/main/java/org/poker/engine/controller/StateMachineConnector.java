@@ -16,7 +16,6 @@
  */
 package org.poker.engine.controller;
 
-import java.util.Collections;
 import java.util.Map;
 import org.poker.api.core.Deck;
 import org.poker.api.game.BetCommand;
@@ -24,11 +23,13 @@ import org.poker.api.game.Settings;
 import org.poker.api.game.TexasHoldEmUtil;
 import org.poker.dispatcher.GameEvent;
 import org.poker.dispatcher.IGameEventDispatcher;
+import static org.poker.engine.controller.GameController.SYSTEM_CONTROLLER;
 import org.poker.engine.model.ModelContext;
 import org.poker.engine.model.ModelUtil;
 import org.poker.engine.states.BetRoundState;
 import org.poker.engine.states.CheckState;
-import org.poker.engine.states.EndState;
+import org.poker.engine.states.EndGameState;
+import org.poker.engine.states.EndHandState;
 import org.poker.engine.states.InitHandState;
 import org.poker.engine.states.ShowDownState;
 import org.poker.engine.states.WinnerState;
@@ -39,7 +40,6 @@ import org.util.statemachine.StateDecoratorBuilder;
 import org.util.statemachine.StateMachine;
 import org.util.statemachine.StateMachineInstance;
 import org.util.timer.IGameTimer;
-import static org.poker.engine.controller.GameController.SYSTEM_CONTROLLER;
 
 /**
  *
@@ -49,7 +49,8 @@ public class StateMachineConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachineConnector.class);
 
-    private static final int END_HAND_SLEEP_TIME = 000;
+    private static final String END_HAND_DELAY = "StateMachineConnector:endHandDelay";
+    private static final String END_GAME_DELAY = "StateMachineConnector:endGameDelay";
 
     public static final String NEXT_PLAYER_TURN = "nextPlayerTurn";
     private final StateMachine<ModelContext> texasStateMachine = buildStateMachine();
@@ -59,6 +60,7 @@ public class StateMachineConnector {
     private IGameEventDispatcher system;
     private StateMachineInstance<ModelContext> instance;
     private long timeoutId = 0;
+    private Map<String, Double> scores;
 
     public StateMachineConnector(IGameTimer timer, Map<String, IGameEventDispatcher> playersDispatcher) {
         this.playersDispatcher = playersDispatcher;
@@ -117,9 +119,6 @@ public class StateMachineConnector {
 
     private void execute() {
         if (instance.execute().isFinish()) {
-            model.setGameState(TexasHoldEmUtil.GameState.END);
-            model.setCommunityCards(Collections.emptyList());
-            notifyEndGame();
             instance = null;
         }
     }
@@ -132,16 +131,18 @@ public class StateMachineConnector {
         String playerTurn = model.getLastPlayerBet().getName();
         BetCommand lbc = model.getLastBetCommand();
         LOGGER.debug("notifyBetCommand -> {}: {}", playerTurn, lbc);
-        playersDispatcher.entrySet().stream().forEach(entry
-                -> entry.getValue().dispatch(
-                        new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, playerTurn, new BetCommand(lbc.getType(), lbc.getChips()))));
+        for (String playerName : playersDispatcher.keySet()) {
+            playersDispatcher.get(playerName).dispatch(
+                    new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, model.getLastPlayerBet().getName(), new BetCommand(lbc.getType(), lbc.getChips())));
+        }
     }
 
     private void notifyCheck() {
         LOGGER.debug("notifyCheck: {}", GameController.CHECK_PLAYER_EVENT_TYPE, model.getCommunityCards());
-        playersDispatcher.entrySet().stream().forEach(entry
-                -> entry.getValue().dispatch(
-                        new GameEvent(GameController.CHECK_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, model.getCommunityCards())));
+        for (String playerName : playersDispatcher.keySet()) {
+            playersDispatcher.get(playerName).dispatch(
+                    new GameEvent(GameController.CHECK_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, model.getCommunityCards()));
+        }
     }
 
     private void notifyPlayerTurn() {
@@ -156,26 +157,31 @@ public class StateMachineConnector {
 
     private void notifyEndHand() {
         notifyEvent(GameController.END_HAND_PLAYER_EVENT_TYPE);
-        try {
-            Thread.sleep(END_HAND_SLEEP_TIME);
-        } catch (Exception ex) {
-            LOGGER.error("Error en la espera despues de terminar una mano.", ex);
-        }
-    }
-
-    private void notifyEndGame() {
-        notifyEvent(GameController.END_GAME_PLAYER_EVENT_TYPE);
-        system.dispatch(new GameEvent(GameController.EXIT_CONNECTOR_EVENT_TYPE, SYSTEM_CONTROLLER));
-        notifyEvent(GameController.EXIT_CONNECTOR_EVENT_TYPE);
     }
 
     private void notifyEvent(String type) {
         LOGGER.debug("notifyEvent: {} -> {}", type, model);
-        playersDispatcher.entrySet().stream().forEach(entry
-                -> entry.getValue().dispatch(
-                        new GameEvent(type, SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, entry.getKey()))));
+        for (String playerName : playersDispatcher.keySet()) {
+            playersDispatcher.get(playerName).dispatch(
+                    new GameEvent(type, SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, playerName)));
+        }
     }
 
+    private void notifyEndGame() {
+        LOGGER.debug("notifyEvent: {} -> {}", GameController.END_GAME_PLAYER_EVENT_TYPE, model);
+        scores =  model.getScores();
+        for (String playerName : playersDispatcher.keySet()) {
+            playersDispatcher.get(playerName).dispatch(
+                    new GameEvent(GameController.END_GAME_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, scores));
+        }
+        system.dispatch(new GameEvent(GameController.EXIT_CONNECTOR_EVENT_TYPE, SYSTEM_CONTROLLER));
+        notifyEvent(GameController.EXIT_CONNECTOR_EVENT_TYPE);
+    }
+
+    public Map<String, Double> getScores() {
+        return scores;
+    }
+    
     private StateMachine<ModelContext> buildStateMachine() {
         StateMachine<ModelContext> sm = new StateMachine<>();
         final IState<ModelContext> initHandState = StateDecoratorBuilder.after(new InitHandState(), () -> notifyInitHand());
@@ -187,7 +193,8 @@ public class StateMachineConnector {
         final IState<ModelContext> checkState = StateDecoratorBuilder.after(new CheckState(), () -> notifyCheck());
         final IState<ModelContext> showDownState = new ShowDownState();
         final IState<ModelContext> winnerState = new WinnerState();
-        final IState<ModelContext> endHandState = StateDecoratorBuilder.before(new EndState(), () -> notifyEndHand());
+        final IState<ModelContext> endHandState = StateDecoratorBuilder.before(new EndHandState(), () -> notifyEndHand());
+        final IState<ModelContext> endGameState = StateDecoratorBuilder.after(new EndGameState(), () -> notifyEndGame());
 
         sm.setInitState(initHandState);
 
@@ -212,6 +219,7 @@ public class StateMachineConnector {
 
         // endHandState transitions
         sm.addTransition(endHandState, initHandState, c -> c.getNumPlayers() > 1 && c.getRound() < c.getSettings().getMaxRounds());
+        sm.setDefaultTransition(endHandState, endGameState);
         return sm;
     }
 }

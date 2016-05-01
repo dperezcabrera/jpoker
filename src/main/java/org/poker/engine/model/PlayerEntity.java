@@ -19,7 +19,6 @@ package org.poker.engine.model;
 import org.poker.api.game.BetCommand;
 import org.poker.api.game.PlayerInfo;
 
-
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
@@ -29,7 +28,25 @@ public class PlayerEntity extends PlayerInfo {
     private int handValue = 0;
     private BetCommand betCommand;
     private boolean showCards;
-    
+    private int roudsSurvival;
+    private long lastRoundChips;
+
+    public int getRoudsSurvival() {
+        return roudsSurvival;
+    }
+
+    public void setRoudsSurvival(int roudsSurvival) {
+        this.roudsSurvival = roudsSurvival;
+    }
+
+    public long getLastRoundChips() {
+        return lastRoundChips;
+    }
+
+    public void setLastRoundChips(long lastRoundChips) {
+        this.lastRoundChips = lastRoundChips;
+    }
+
     public boolean showCards() {
         return showCards;
     }

@@ -16,6 +16,7 @@
  */
 package org.poker.api.game;
 
+import java.io.Serializable;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -23,7 +24,8 @@ import net.jcip.annotations.NotThreadSafe;
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
 @NotThreadSafe
-public class Settings {
+public class Settings implements Serializable{
+    private static final long serialVersionUID = 1L;
 
     private int maxPlayers;
     private long time;

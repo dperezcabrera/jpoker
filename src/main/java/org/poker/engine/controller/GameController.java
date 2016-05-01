@@ -64,16 +64,16 @@ public class GameController implements IGameController, Runnable {
     public static final String TIMEOUT_CONNECTOR_EVENT_TYPE = "timeOutCommand";
     public static final String CREATE_GAME_CONNECTOR_EVENT_TYPE = "createGame";
 
-    final Map<String, IGameEventDispatcher> players = new HashMap<>();
-    final List<String> playersByName = new ArrayList<>();
-    final List<ExecutorService> subExecutors = new ArrayList<>();
-    final Map<String, IGameEventProcessor<IStrategy>> playerProcessors;
-    final GameEventDispatcher<StateMachineConnector> connectorDispatcher;
-    final StateMachineConnector stateMachineConnector;
-    final IGameTimer timer;
-    Settings settings;
-    ExecutorService executors;
-    boolean finish;
+    private final Map<String, IGameEventDispatcher> players = new HashMap<>();
+    private final List<String> playersByName = new ArrayList<>();
+    private final List<ExecutorService> subExecutors = new ArrayList<>();
+    private final Map<String, IGameEventProcessor<IStrategy>> playerProcessors;
+    private final GameEventDispatcher<StateMachineConnector> connectorDispatcher;
+    private final StateMachineConnector stateMachineConnector;
+    private final IGameTimer timer;
+    private Settings settings;
+    private ExecutorService executors;
+    private boolean finish = false;
 
     public GameController() {
         timer = new GameTimer(SYSTEM_CONTROLLER, buildExecutor(DISPATCHER_THREADS));
@@ -102,10 +102,9 @@ public class GameController implements IGameController, Runnable {
 
     private Map<String, IGameEventProcessor<IStrategy>> buildPlayerProcessors() {
         Map<String, IGameEventProcessor<IStrategy>> playerProcessorsMap = new HashMap<>();
-        IGameEventProcessor<IStrategy> defaultProcessor = (strategy, event) -> strategy.updateState((GameInfo) event.getPayload());
-        playerProcessorsMap.put(INIT_HAND_EVENT_TYPE, defaultProcessor);
-        playerProcessorsMap.put(END_HAND_PLAYER_EVENT_TYPE, defaultProcessor);
-        playerProcessorsMap.put(END_GAME_PLAYER_EVENT_TYPE, defaultProcessor);
+        playerProcessorsMap.put(INIT_HAND_EVENT_TYPE, (strategy, event) -> strategy.initHand((GameInfo) event.getPayload()));
+        playerProcessorsMap.put(END_HAND_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.endHand((GameInfo) event.getPayload()));
+        playerProcessorsMap.put(END_GAME_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.endGame((Map<String, Double>) event.getPayload()));
         playerProcessorsMap.put(BET_COMMAND_EVENT_TYPE, (strategy, event) -> strategy.onPlayerCommand(event.getSource(), (BetCommand) event.getPayload()));
         playerProcessorsMap.put(CHECK_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.check((List<Card>) event.getPayload()));
         playerProcessorsMap.put(GET_COMMAND_PLAYER_EVENT_TYPE, (strategy, event) -> {
@@ -148,7 +147,7 @@ public class GameController implements IGameController, Runnable {
         check(players.size() <= settings.getMaxPlayers(), "El número de jugadores excede el máximo permitido por configuración.");
         check(settings.getMaxErrors() > 0, "El número de máximo de errores debe ser mayor que '0'.");
         check(settings.getMaxRounds() > 0, "El número de máximo de rondas debe ser mayor que '0'.");
-        check(settings.getRounds4IncrementBlind()> 1, "El número de rondas hasta incrementar las ciegas debe ser mayor que '1'.");
+        check(settings.getRounds4IncrementBlind() > 1, "El número de rondas hasta incrementar las ciegas debe ser mayor que '1'.");
         check(settings.getTime() > 0, "El tiempo máximo por jugador debe ser mayor que '0' y se indica en ms.");
         check(settings.getPlayerChip() > 0, "El número de fichas inicial por jugador debe ser mayor que '0', el valor recomendado es 5000.");
         check(settings.getSmallBind() > 0, "La apuesta de la ciega pequeña debe ser mayor que '0' idealmente es la centesima parte de las fichas iniciales por jugador.");
@@ -158,7 +157,6 @@ public class GameController implements IGameController, Runnable {
         timer.setTime(settings.getTime());
         playersByName.stream().forEach(stateMachineConnector::addPlayer);
         executors.execute(timer);
-        finish = false;
         new Thread(this).start();
     }
 
@@ -168,27 +166,44 @@ public class GameController implements IGameController, Runnable {
         connectorDispatcher.dispatch(new GameEvent(INIT_HAND_EVENT_TYPE, SYSTEM_CONTROLLER));
         connectorDispatcher.run();
         // Fin de la ejecución
-        timer.exit();
-        executors.shutdown();
-        players.values().stream().forEach(IGameEventDispatcher::exit);
-        subExecutors.stream().forEach(ExecutorService::shutdown);
-        try {
-            executors.awaitTermination(0, TimeUnit.SECONDS);
-        } catch (Exception ex) {
-            LOGGER.error("Error intentando eliminar cerrar todos los hilos", ex);
-        }
-        finish = true;
+        exit();
         notifyAll();
     }
 
+    @Override
+    public Map<String, Double> getScores() {
+        return stateMachineConnector.getScores();
+    }
+    
     @Override
     public synchronized void waitFinish() {
         if (!finish) {
             try {
                 wait();
-            } catch (Exception ex) {
-                LOGGER.error("Esperando el final del juego", ex);
+            } catch (InterruptedException ex) {
+                LOGGER.error("Esperando el final", ex);
             }
+        }
+    }
+
+    @Override
+    public void stop() {
+        exit();
+    }
+
+    private void exit() {
+        if (!finish) {
+            connectorDispatcher.exit();
+            timer.exit();
+            executors.shutdown();
+            players.values().stream().forEach(IGameEventDispatcher::exit);
+            subExecutors.stream().forEach(ExecutorService::shutdown);
+            try {
+                executors.awaitTermination(0, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                LOGGER.error("Error intentando eliminar todos los hilos", ex);
+            }
+            finish = true;
         }
     }
 }

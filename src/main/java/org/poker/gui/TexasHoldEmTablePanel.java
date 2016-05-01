@@ -40,7 +40,6 @@ import org.poker.api.game.IStrategy;
 import org.poker.api.game.PlayerInfo;
 import org.poker.api.game.TexasHoldEmUtil;
 import org.poker.api.game.TexasHoldEmUtil.BetCommandType;
-import org.poker.api.game.TexasHoldEmUtil.GameState;
 import org.poker.api.game.TexasHoldEmUtil.PlayerState;
 import static org.poker.gui.ImageManager.IMAGES_PATH;
 
@@ -97,6 +96,9 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
     private int playerTurn = -1;
     private int dealer = 0;
     private int round = 0;
+
+    public TexasHoldEmTablePanel() {
+    }
 
     public void setStrategy(IStrategy delegate) {
         this.delegate = delegate;
@@ -221,14 +223,20 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
         Graphics2D graphics2d = (Graphics2D) g;
         graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         paintBackground(graphics2d);
-        paintCommunityCards(graphics2d);
-        paintChips(graphics2d);
+        if (!playersByName.isEmpty()) {
+            paintCommunityCards(graphics2d);
+            paintChips(graphics2d);
+        }
         paintPlayers(graphics2d);
     }
 
     @Override
     public String getName() {
-        return delegate.getName();
+        String result = "";
+        if (delegate != null) {
+            result = delegate.getName();
+        }
+        return result;
     }
 
     @Override
@@ -286,7 +294,7 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
         int i = (currentPlayerTurn + 1) % players.length;
         while (i != currentPlayerTurn) {
             if (players[i] != null && players[i].isActive() && (bets[i] == null || players[i].getBet() < maxBet)) {
-                long activePlayers = Arrays.stream(players).filter(p -> p!= null && (p.isActive() || p.getState() == PlayerState.ALL_IN)).count();
+                long activePlayers = Arrays.stream(players).filter(p -> p != null && (p.isActive() || p.getState() == PlayerState.ALL_IN)).count();
                 if (activePlayers == 1) {
                     return -1;
                 } else {
@@ -299,22 +307,37 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
     }
 
     @Override
-    public synchronized void updateState(GameInfo<PlayerInfo> state) {
-        if (state.getGameState() == GameState.PRE_FLOP) {
-            updateStatePreFlop(state);
-        }
-        playerTurn = positionConverter(state, state.getPlayerTurn());
-        updatePlayerInfo(state);
-        if (round != state.getRound() || state.getGameState() == GameState.END) {
-            if (state.getGameState() != GameState.END) {
-                setCommunityCards(state.getCommunityCards());
-                pots.clear();
-            }
-            Arrays.fill(bets, null);
-        }
+    public synchronized void initHand(GameInfo<PlayerInfo> state) {
+        updateStatePreFlop(state);
+        updateState(state);
         round = state.getRound();
         repaint();
-        delegate.updateState(state);
+        delegate.initHand(state);
+    }
+
+    @Override
+    public synchronized void endHand(GameInfo<PlayerInfo> state) {
+        updateState(state);
+        repaint();
+        delegate.endHand(state);
+    }
+
+    @Override
+    public synchronized void endGame(Map<String, Double> scores) {
+        pots.clear();
+        Arrays.fill(bets, null);
+        repaint();
+        delegate.endGame(scores);
+    }
+
+    private void updateState(GameInfo<PlayerInfo> state) {
+        playerTurn = positionConverter(state, state.getPlayerTurn());
+        updatePlayerInfo(state);
+        if (round != state.getRound()) {
+            setCommunityCards(state.getCommunityCards());
+            pots.clear();
+            Arrays.fill(bets, null);
+        }
     }
 
     private void updateStatePreFlop(GameInfo<PlayerInfo> state) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import org.util.statemachine.IState;
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
 @ThreadSafe
-public class EndState implements IState<ModelContext> {
+public class EndHandState implements IState<ModelContext> {
 
     public static final String NAME = "EndHand";
 

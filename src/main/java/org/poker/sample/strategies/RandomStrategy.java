@@ -83,11 +83,6 @@ public class RandomStrategy implements IStrategy {
     }
 
     @Override
-    public void updateState(GameInfo<PlayerInfo> state) {
-        lastBet = null;
-    }
-
-    @Override
     public String toString() {
         return String.join("{RandomStrategy-", name, "}");
     }

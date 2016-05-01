@@ -16,6 +16,8 @@
  */
 package org.poker.api.game;
 
+import java.util.Map;
+
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
@@ -29,4 +31,8 @@ public interface IGameController {
     public void start() throws GameException;
 
     public void waitFinish();
+
+    public void stop();
+
+    public Map<String, Double> getScores();
 }

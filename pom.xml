@@ -10,34 +10,41 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-	<coveralls-maven-plugin-version>2.2.0</coveralls-maven-plugin-version>
-	<jacoco-maven-plugin-version>0.7.5.201505241946</jacoco-maven-plugin-version>
+        <coveralls-maven-plugin-version>2.2.0</coveralls-maven-plugin-version>
+        <jacoco-maven-plugin-version>0.7.5.201505241946</jacoco-maven-plugin-version>
         <junit.version>4.11</junit.version>
         <assertj.version>1.6.1</assertj.version>
         <cucumber.version>1.2.0</cucumber.version>
         <slf4j.version>1.7.10</slf4j.version>
         <logback.version>1.1.2</logback.version>
         <jcip.verion>1.0</jcip.verion>
-        
+        <spring.version>4.2.5.RELEASE</spring.version>
         <main.class>a.org.poker.main.MainController</main.class>
     </properties>
-	<scm>
-		<url>https://github.com/dperezcabrera/jpoker</url>
-		<connection>scm:git:git://github.com/dperezcabrera/jpoker.git</connection>
+    <scm>
+        <url>https://github.com/dperezcabrera/jpoker</url>
+        <connection>scm:git:git://github.com/dperezcabrera/jpoker.git</connection>
         <tag>HEAD</tag>
-	</scm>
+    </scm>
 
-	<issueManagement>
-		<url>https://github.com/dperezcabrera/jpoker/issues/</url>
-		<system>GitHub Issues</system>
-	</issueManagement>
+    <issueManagement>
+        <url>https://github.com/dperezcabrera/jpoker/issues/</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
 
-	<ciManagement>
-		<system>Travis</system>
-		<url>https://travis-ci.org/dperezcabrera/jpoker/</url>
-	</ciManagement>
+    <ciManagement>
+        <system>Travis</system>
+        <url>https://travis-ci.org/dperezcabrera/jpoker/</url>
+    </ciManagement>
 	
     <dependencies>
+        <!-- IoD -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        
         <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -122,25 +129,25 @@
             </plugin>
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
-		<artifactId>coveralls-maven-plugin</artifactId>
-		<version>${coveralls-maven-plugin-version}</version>
-		<configuration>
-		    <sourceEncoding>UTF8</sourceEncoding>
-		    <repoToken>${env.coveralls_repo_token}</repoToken>
-		</configuration>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls-maven-plugin-version}</version>
+                <configuration>
+                    <sourceEncoding>UTF8</sourceEncoding>
+                    <repoToken>${env.coveralls_repo_token}</repoToken>
+                </configuration>
             </plugin>
             <plugin>
-		<groupId>org.jacoco</groupId>
-		<artifactId>jacoco-maven-plugin</artifactId>
-		<version>${jacoco-maven-plugin-version}</version>
-		<executions>
-		    <execution>
-		        <id>default-prepare-agent</id>
-		        <goals>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin-version}</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
                             <goal>prepare-agent</goal>
-		        </goals>
-		    </execution>
-	        </executions>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

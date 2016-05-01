@@ -25,13 +25,16 @@ import org.poker.api.game.IStrategy;
 import org.poker.api.game.Settings;
 import org.poker.engine.controller.GameController;
 import org.poker.gui.TexasHoldEmView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
 public final class MainController {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
+    
     private static final int PLAYERS = 10;
 
     private MainController() {
@@ -64,6 +67,9 @@ public final class MainController {
             }
             controller.start();
             controller.waitFinish();
+            controller.waitFinish();
+            LOGGER.info("scores: {}", controller.getScores());
+            Thread.sleep(1000);
         }
     }
 }

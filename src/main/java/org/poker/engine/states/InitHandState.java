@@ -45,6 +45,7 @@ public class InitHandState implements IState<ModelContext> {
 
     @Override
     public boolean execute(ModelContext model) {
+        model.setScores(null);
         Deck deck = model.getDeck();
         deck.shuffle();
         Settings settings = model.getSettings();
@@ -58,6 +59,8 @@ public class InitHandState implements IState<ModelContext> {
         model.setHighBet(0L);
         List<PlayerEntity> players = model.getPlayers();
         for (PlayerEntity p : players) {
+            p.setRoudsSurvival(model.getRound());
+            p.setLastRoundChips(p.getChips());
             p.setState(PlayerState.READY);
             p.setHandValue(0);
             p.setBet(0);
