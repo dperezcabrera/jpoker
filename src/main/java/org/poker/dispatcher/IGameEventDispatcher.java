@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@ package org.poker.dispatcher;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
+ * 
+ * @param <E>
  */
-public interface IGameEventDispatcher extends Runnable {
+public interface IGameEventDispatcher<E extends Enum> extends Runnable {
 
-    public void dispatch(GameEvent event);
+    public void dispatch(GameEvent<E> event);
     public void exit();
 }
