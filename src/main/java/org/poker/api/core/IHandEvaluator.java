@@ -20,6 +20,7 @@ package org.poker.api.core;
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
+@FunctionalInterface
 public interface IHandEvaluator {
      public int eval(Card[] cards);
 }

@@ -28,7 +28,7 @@ public final class Card {
 
     private static final String STRING_RANK_CARDS = "23456789TJQKA";
 
-    public static enum Suit {
+    public enum Suit {
 
         SPADE('♠'), HEART('♥'), DIAMOND('♦'), CLUB('♣');
         
@@ -40,7 +40,7 @@ public final class Card {
 
     }
 
-    public static enum Rank {
+    public enum Rank {
 
         TWO, TRHEE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
     }

@@ -18,6 +18,8 @@ package org.util.combinatorial;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -25,6 +27,9 @@ import static org.junit.Assert.*;
  */
 public class CombinationContructorTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+    
     /**
      * Test of constructor, of class Combination.
      */
@@ -42,22 +47,28 @@ public class CombinationContructorTest {
     /**
      * Test of constructor, of class Combination.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testContructorSubItemError() {
         System.out.println("Combination(0,1)");
         int subItems = 0;
         int items = 1;
+        
+        thrown.expect(IllegalArgumentException.class);
+        
         Combination instance = new Combination(subItems, items);
     }
 
     /**
      * Test of constructor, of class Combination.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testContructorItemError() {
         System.out.println("Combination(5,1)");
         int subItems = 5;
         int items = 1;
+        
+        thrown.expect(IllegalArgumentException.class);
+        
         Combination instance = new Combination(subItems, items);
     }
 }
