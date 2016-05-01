@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,42 +23,38 @@ import org.poker.api.game.Settings;
 import org.poker.api.game.TexasHoldEmUtil;
 import org.poker.dispatcher.GameEvent;
 import org.poker.dispatcher.IGameEventDispatcher;
-import static org.poker.engine.controller.GameController.SYSTEM_CONTROLLER;
 import org.poker.engine.model.ModelContext;
 import org.poker.engine.model.ModelUtil;
-import org.poker.engine.states.BetRoundState;
-import org.poker.engine.states.CheckState;
-import org.poker.engine.states.EndGameState;
-import org.poker.engine.states.EndHandState;
-import org.poker.engine.states.InitHandState;
-import org.poker.engine.states.ShowDownState;
-import org.poker.engine.states.WinnerState;
+import org.poker.engine.states.BetRoundTrigger;
+import org.poker.engine.states.CheckTrigger;
+import org.poker.engine.states.EndGameTrigger;
+import org.poker.engine.states.EndHandTrigger;
+import org.poker.engine.states.InitHandTrigger;
+import org.poker.engine.states.PokerStates;
+import org.poker.engine.states.ShowDownTrigger;
+import org.poker.engine.states.WinnerTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.util.statemachine.IState;
 import org.util.statemachine.StateDecoratorBuilder;
 import org.util.statemachine.StateMachine;
 import org.util.statemachine.StateMachineInstance;
 import org.util.timer.IGameTimer;
+import org.util.statemachine.IStateTrigger;
 
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public class StateMachineConnector {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachineConnector.class);
 
-    private static final String END_HAND_DELAY = "StateMachineConnector:endHandDelay";
-    private static final String END_GAME_DELAY = "StateMachineConnector:endGameDelay";
-
-    public static final String NEXT_PLAYER_TURN = "nextPlayerTurn";
-    private final StateMachine<ModelContext> texasStateMachine = buildStateMachine();
+    private final StateMachine<PokerStates, ModelContext> texasStateMachine = buildStateMachine();
     private final Map<String, IGameEventDispatcher> playersDispatcher;
-    private final IGameTimer timer;
-    private ModelContext model;
-    private IGameEventDispatcher system;
-    private StateMachineInstance<ModelContext> instance;
+    final IGameTimer timer;
+    ModelContext model;
+    IGameEventDispatcher<ConnectorGameEventType> system;
+    StateMachineInstance<PokerStates, ModelContext> instance;
     private long timeoutId = 0;
     private Map<String, Double> scores;
 
@@ -67,7 +63,7 @@ public class StateMachineConnector {
         this.timer = timer;
     }
 
-    public void setSystem(IGameEventDispatcher system) {
+    public void setSystem(IGameEventDispatcher<ConnectorGameEventType> system) {
         this.system = system;
     }
 
@@ -124,25 +120,23 @@ public class StateMachineConnector {
     }
 
     private void notifyInitHand() {
-        notifyEvent(GameController.INIT_HAND_EVENT_TYPE);
+        notifyEvent(PokerEventType.INIT_HAND);
     }
 
     private void notifyBetCommand() {
         String playerTurn = model.getLastPlayerBet().getName();
         BetCommand lbc = model.getLastBetCommand();
         LOGGER.debug("notifyBetCommand -> {}: {}", playerTurn, lbc);
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, model.getLastPlayerBet().getName(), new BetCommand(lbc.getType(), lbc.getChips())));
-        }
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                    new GameEvent<>(PokerEventType.BET_COMMAND, model.getLastPlayerBet().getName(), new BetCommand(lbc.getType(), lbc.getChips()))));
     }
 
     private void notifyCheck() {
-        LOGGER.debug("notifyCheck: {}", GameController.CHECK_PLAYER_EVENT_TYPE, model.getCommunityCards());
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(GameController.CHECK_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, model.getCommunityCards()));
-        }
+        LOGGER.debug("notifyCheck: {}", PokerEventType.CHECK, model.getCommunityCards());
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                        new GameEvent<>(PokerEventType.CHECK, GameController.SYSTEM_CONTROLLER, model.getCommunityCards())));
     }
 
     private void notifyPlayerTurn() {
@@ -150,76 +144,82 @@ public class StateMachineConnector {
         if (playerTurn != null) {
             LOGGER.debug("notifyPlayerTurn -> {}", playerTurn);
             playersDispatcher.get(playerTurn).dispatch(
-                    new GameEvent(GameController.GET_COMMAND_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, playerTurn)));
+                    new GameEvent<>(PokerEventType.GET_COMMAND, GameController.SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, playerTurn)));
         }
-        timer.resetTimer(++timeoutId);
+        timer.changeTimeoutId(++timeoutId);
     }
 
     private void notifyEndHand() {
-        notifyEvent(GameController.END_HAND_PLAYER_EVENT_TYPE);
+        notifyEvent(PokerEventType.END_HAND);
     }
 
-    private void notifyEvent(String type) {
+    private void notifyEvent(PokerEventType type) {
         LOGGER.debug("notifyEvent: {} -> {}", type, model);
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(type, SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, playerName)));
-        }
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                        new GameEvent<>(type, GameController.SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, entry.getKey()))));
     }
 
     private void notifyEndGame() {
-        LOGGER.debug("notifyEvent: {} -> {}", GameController.END_GAME_PLAYER_EVENT_TYPE, model);
-        scores =  model.getScores();
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(GameController.END_GAME_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, scores));
-        }
-        system.dispatch(new GameEvent(GameController.EXIT_CONNECTOR_EVENT_TYPE, SYSTEM_CONTROLLER));
-        notifyEvent(GameController.EXIT_CONNECTOR_EVENT_TYPE);
+        LOGGER.debug("notifyEvent: {} -> {}", PokerEventType.END_GAME, model);
+        scores = model.getScores();
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                        new GameEvent<>(PokerEventType.END_GAME, GameController.SYSTEM_CONTROLLER, scores)));
+        system.dispatch(new GameEvent<>(ConnectorGameEventType.EXIT, GameController.SYSTEM_CONTROLLER));
+        notifyEvent(PokerEventType.EXIT);
     }
 
     public Map<String, Double> getScores() {
         return scores;
     }
-    
-    private StateMachine<ModelContext> buildStateMachine() {
-        StateMachine<ModelContext> sm = new StateMachine<>();
-        final IState<ModelContext> initHandState = StateDecoratorBuilder.after(new InitHandState(), () -> notifyInitHand());
-        final IState<ModelContext> betRoundState = StateDecoratorBuilder
-                .create(new BetRoundState())
+
+    private StateMachine<PokerStates, ModelContext> buildStateMachine() {
+        StateMachine<PokerStates, ModelContext> sm = new StateMachine<>();
+        final IStateTrigger<ModelContext> initHandTrigger = StateDecoratorBuilder.after(new InitHandTrigger(), () -> notifyInitHand());
+        final IStateTrigger<ModelContext> betRoundTrigger = StateDecoratorBuilder
+                .create(new BetRoundTrigger())
                 .before(() -> notifyPlayerTurn())
                 .after(() -> notifyBetCommand())
                 .build();
-        final IState<ModelContext> checkState = StateDecoratorBuilder.after(new CheckState(), () -> notifyCheck());
-        final IState<ModelContext> showDownState = new ShowDownState();
-        final IState<ModelContext> winnerState = new WinnerState();
-        final IState<ModelContext> endHandState = StateDecoratorBuilder.before(new EndHandState(), () -> notifyEndHand());
-        final IState<ModelContext> endGameState = StateDecoratorBuilder.after(new EndGameState(), () -> notifyEndGame());
+        final IStateTrigger<ModelContext> checkTrigger = StateDecoratorBuilder.after(new CheckTrigger(), () -> notifyCheck());
+        final IStateTrigger<ModelContext> showDownTrigger = new ShowDownTrigger();
+        final IStateTrigger<ModelContext> winnerTrigger = new WinnerTrigger();
+        final IStateTrigger<ModelContext> endHandTrigger = StateDecoratorBuilder.before(new EndHandTrigger(), () -> notifyEndHand());
+        final IStateTrigger<ModelContext> endGameTrigger = StateDecoratorBuilder.after(new EndGameTrigger(), () -> notifyEndGame());
 
-        sm.setInitState(initHandState);
+        sm.setTrigger(PokerStates.BET_ROUND, betRoundTrigger);
+        sm.setTrigger(PokerStates.CHECK, checkTrigger);
+        sm.setTrigger(PokerStates.END_GAME, endGameTrigger);
+        sm.setTrigger(PokerStates.END_HAND, endHandTrigger);
+        sm.setTrigger(PokerStates.INIT_HAND, initHandTrigger);
+        sm.setTrigger(PokerStates.SHOWDOWN, showDownTrigger);
+        sm.setTrigger(PokerStates.WINNER, winnerTrigger);
+        
+        sm.setInitState(PokerStates.INIT_HAND);
 
-        // initHandState transitions
-        sm.setDefaultTransition(initHandState, betRoundState);
+        // init hand state transitions
+        sm.setDefaultTransition(PokerStates.INIT_HAND, PokerStates.BET_ROUND);
 
-        // betRoundState transitions
-        sm.addTransition(betRoundState, betRoundState, c -> c.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
-        sm.addTransition(betRoundState, winnerState, c -> c.getPlayersAllIn() + c.getActivePlayers() == 1);
-        sm.setDefaultTransition(betRoundState, checkState);
+        // bet round state transitions
+        sm.addTransition(PokerStates.BET_ROUND, PokerStates.BET_ROUND, m -> m.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
+        sm.addTransition(PokerStates.BET_ROUND, PokerStates.WINNER, m -> m.getPlayersAllIn() + m.getActivePlayers() == 1);
+        sm.setDefaultTransition(PokerStates.BET_ROUND, PokerStates.CHECK);
 
-        // checkState transitions
-        sm.addTransition(checkState, showDownState, c -> c.getGameState() == TexasHoldEmUtil.GameState.SHOWDOWN);
-        sm.addTransition(checkState, betRoundState, c -> c.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
-        sm.setDefaultTransition(checkState, checkState);
+        // check state transitions
+        sm.addTransition(PokerStates.CHECK, PokerStates.SHOWDOWN, m -> m.getGameState() == TexasHoldEmUtil.GameState.SHOWDOWN);
+        sm.addTransition(PokerStates.CHECK, PokerStates.BET_ROUND, m -> m.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
+        sm.setDefaultTransition(PokerStates.CHECK, PokerStates.CHECK);
 
-        // betWinnerState transitions
-        sm.setDefaultTransition(winnerState, endHandState);
+        // winner state transitions
+        sm.setDefaultTransition(PokerStates.WINNER, PokerStates.END_HAND);
 
-        // showDownState transitions
-        sm.setDefaultTransition(showDownState, endHandState);
+        // showdown state transitions
+        sm.setDefaultTransition(PokerStates.SHOWDOWN, PokerStates.END_HAND);
 
-        // endHandState transitions
-        sm.addTransition(endHandState, initHandState, c -> c.getNumPlayers() > 1 && c.getRound() < c.getSettings().getMaxRounds());
-        sm.setDefaultTransition(endHandState, endGameState);
+        // end hand state transitions
+        sm.addTransition(PokerStates.END_HAND, PokerStates.INIT_HAND, m -> m.getNumPlayers() > 1 && m.getRound() < m.getSettings().getMaxRounds());
+        sm.setDefaultTransition(PokerStates.END_HAND, PokerStates.END_GAME);
         return sm;
     }
 }

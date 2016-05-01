@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import org.util.timer.IGameTimer;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
  */
 public class GameController implements IGameController, Runnable {
 
@@ -50,25 +51,12 @@ public class GameController implements IGameController, Runnable {
     private static final int DISPATCHER_THREADS = 1;
     private static final int EXTRA_THREADS = 2;
     public static final String SYSTEM_CONTROLLER = "system";
-    public static final String INIT_HAND_EVENT_TYPE = "initHand";
-    public static final String BET_COMMAND_EVENT_TYPE = "betCommand";
-
-    public static final String END_GAME_PLAYER_EVENT_TYPE = "endGame";
-    public static final String END_HAND_PLAYER_EVENT_TYPE = "endHand";
-    public static final String CHECK_PLAYER_EVENT_TYPE = "check";
-    public static final String GET_COMMAND_PLAYER_EVENT_TYPE = "getCommand";
-
-    public static final String EXIT_CONNECTOR_EVENT_TYPE = "exit";
-    public static final String ADD_PLAYER_CONNECTOR_EVENT_TYPE = "addPlayer";
-
-    public static final String TIMEOUT_CONNECTOR_EVENT_TYPE = "timeOutCommand";
-    public static final String CREATE_GAME_CONNECTOR_EVENT_TYPE = "createGame";
-
+   
     private final Map<String, IGameEventDispatcher> players = new HashMap<>();
     private final List<String> playersByName = new ArrayList<>();
     private final List<ExecutorService> subExecutors = new ArrayList<>();
-    private final Map<String, IGameEventProcessor<IStrategy>> playerProcessors;
-    private final GameEventDispatcher<StateMachineConnector> connectorDispatcher;
+    private final Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> playerProcessors;
+    private final GameEventDispatcher<ConnectorGameEventType, StateMachineConnector> connectorDispatcher;
     private final StateMachineConnector stateMachineConnector;
     private final IGameTimer timer;
     private Settings settings;
@@ -76,11 +64,11 @@ public class GameController implements IGameController, Runnable {
     private boolean finish = false;
 
     public GameController() {
-        timer = new GameTimer(SYSTEM_CONTROLLER, buildExecutor(DISPATCHER_THREADS));
+        timer = new GameTimer(buildExecutor(DISPATCHER_THREADS));
         stateMachineConnector = new StateMachineConnector(timer, players);
-        connectorDispatcher = new GameEventDispatcher<>(stateMachineConnector, buildConnectorProcessors(), buildExecutor(1));
+        connectorDispatcher = new GameEventDispatcher<>(stateMachineConnector, buildConnectorProcessors(), buildExecutor(1), ConnectorGameEventType.EXIT);
         stateMachineConnector.setSystem(connectorDispatcher);
-        timer.setDispatcher(connectorDispatcher);
+        timer.setNotifier((timeoutId) -> connectorDispatcher.dispatch(new GameEvent<>(ConnectorGameEventType.TIMEOUT, SYSTEM_CONTROLLER, timeoutId)));
         playerProcessors = buildPlayerProcessors();
     }
 
@@ -90,28 +78,28 @@ public class GameController implements IGameController, Runnable {
         return result;
     }
 
-    private static Map<String, IGameEventProcessor<StateMachineConnector>> buildConnectorProcessors() {
-        Map<String, IGameEventProcessor<StateMachineConnector>> connectorProcessorsMap = new HashMap<>();
-        connectorProcessorsMap.put(CREATE_GAME_CONNECTOR_EVENT_TYPE, (connector, event) -> connector.createGame((Settings) event.getPayload()));
-        connectorProcessorsMap.put(ADD_PLAYER_CONNECTOR_EVENT_TYPE, (connector, event) -> connector.addPlayer(event.getSource()));
-        connectorProcessorsMap.put(INIT_HAND_EVENT_TYPE, (connector, event) -> connector.startGame());
-        connectorProcessorsMap.put(BET_COMMAND_EVENT_TYPE, (connector, event) -> connector.betCommand(event.getSource(), (BetCommand) event.getPayload()));
-        connectorProcessorsMap.put(TIMEOUT_CONNECTOR_EVENT_TYPE, (connector, event) -> connector.timeOutCommand((Long) event.getPayload()));
+    private static Map<ConnectorGameEventType, IGameEventProcessor<ConnectorGameEventType, StateMachineConnector>> buildConnectorProcessors() {
+        Map<ConnectorGameEventType, IGameEventProcessor<ConnectorGameEventType, StateMachineConnector>> connectorProcessorsMap = new HashMap<>();
+        connectorProcessorsMap.put(ConnectorGameEventType.CREATE_GAME, (connector, event) -> connector.createGame((Settings) event.getPayload()));
+        connectorProcessorsMap.put(ConnectorGameEventType.ADD_PLAYER, (connector, event) -> connector.addPlayer(event.getSource()));
+        connectorProcessorsMap.put(ConnectorGameEventType.INIT_GAME, (connector, event) -> connector.startGame());
+        connectorProcessorsMap.put(ConnectorGameEventType.BET_COMMAND, (connector, event) -> connector.betCommand(event.getSource(), (BetCommand) event.getPayload()));
+        connectorProcessorsMap.put(ConnectorGameEventType.TIMEOUT, (connector, event) -> connector.timeOutCommand((Long) event.getPayload()));
         return connectorProcessorsMap;
     }
 
-    private Map<String, IGameEventProcessor<IStrategy>> buildPlayerProcessors() {
-        Map<String, IGameEventProcessor<IStrategy>> playerProcessorsMap = new HashMap<>();
-        playerProcessorsMap.put(INIT_HAND_EVENT_TYPE, (strategy, event) -> strategy.initHand((GameInfo) event.getPayload()));
-        playerProcessorsMap.put(END_HAND_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.endHand((GameInfo) event.getPayload()));
-        playerProcessorsMap.put(END_GAME_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.endGame((Map<String, Double>) event.getPayload()));
-        playerProcessorsMap.put(BET_COMMAND_EVENT_TYPE, (strategy, event) -> strategy.onPlayerCommand(event.getSource(), (BetCommand) event.getPayload()));
-        playerProcessorsMap.put(CHECK_PLAYER_EVENT_TYPE, (strategy, event) -> strategy.check((List<Card>) event.getPayload()));
-        playerProcessorsMap.put(GET_COMMAND_PLAYER_EVENT_TYPE, (strategy, event) -> {
+    private Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> buildPlayerProcessors() {
+        Map<PokerEventType, IGameEventProcessor<PokerEventType, IStrategy>> playerProcessorsMap = new HashMap<>();
+        playerProcessorsMap.put(PokerEventType.INIT_HAND, (strategy, event) -> strategy.initHand((GameInfo) event.getPayload()));
+        playerProcessorsMap.put(PokerEventType.END_HAND, (strategy, event) -> strategy.endHand((GameInfo) event.getPayload()));
+        playerProcessorsMap.put(PokerEventType.END_GAME, (strategy, event) -> strategy.endGame((Map<String, Double>) event.getPayload()));
+        playerProcessorsMap.put(PokerEventType.BET_COMMAND, (strategy, event) -> strategy.onPlayerCommand(event.getSource(), (BetCommand) event.getPayload()));
+        playerProcessorsMap.put(PokerEventType.CHECK, (strategy, event) -> strategy.check((List<Card>) event.getPayload()));
+        playerProcessorsMap.put(PokerEventType.GET_COMMAND, (strategy, event) -> {
             GameInfo<PlayerInfo> gi = (GameInfo<PlayerInfo>) event.getPayload();
             String playerTurn = gi.getPlayers().get(gi.getPlayerTurn()).getName();
             BetCommand command = strategy.getCommand(gi);
-            connectorDispatcher.dispatch(new GameEvent(BET_COMMAND_EVENT_TYPE, playerTurn, command));
+            connectorDispatcher.dispatch(new GameEvent<>(ConnectorGameEventType.BET_COMMAND, playerTurn, command));
         });
         return playerProcessorsMap;
     }
@@ -126,7 +114,7 @@ public class GameController implements IGameController, Runnable {
         boolean result = false;
         String name = strategy.getName();
         if (!players.containsKey(name) && !SYSTEM_CONTROLLER.equals(name)) {
-            players.put(name, new GameEventDispatcher<>(strategy, playerProcessors, buildExecutor(DISPATCHER_THREADS)));
+            players.put(name, new GameEventDispatcher<>(strategy, playerProcessors, buildExecutor(DISPATCHER_THREADS), PokerEventType.EXIT));
             playersByName.add(name);
             result = true;
         }
@@ -163,7 +151,7 @@ public class GameController implements IGameController, Runnable {
     @Override
     public synchronized void run() {
         LOGGER.debug("run");
-        connectorDispatcher.dispatch(new GameEvent(INIT_HAND_EVENT_TYPE, SYSTEM_CONTROLLER));
+        connectorDispatcher.dispatch(new GameEvent<>(ConnectorGameEventType.INIT_GAME, SYSTEM_CONTROLLER));
         connectorDispatcher.run();
         // Fin de la ejecución
         exit();
@@ -180,7 +168,7 @@ public class GameController implements IGameController, Runnable {
         if (!finish) {
             try {
                 wait();
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("Esperando el final", ex);
             }
         }
@@ -200,7 +188,7 @@ public class GameController implements IGameController, Runnable {
             subExecutors.stream().forEach(ExecutorService::shutdown);
             try {
                 executors.awaitTermination(0, TimeUnit.SECONDS);
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("Error intentando eliminar todos los hilos", ex);
             }
             finish = true;
