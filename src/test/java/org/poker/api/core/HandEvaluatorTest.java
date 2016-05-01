@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -32,7 +31,10 @@ import org.util.combinatorial.ICombinatorial;
 import org.util.combinatorial.Combination;
 import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import static org.poker.api.core.Deck.getAllCards;
 
 /**
@@ -40,6 +42,9 @@ import static org.poker.api.core.Deck.getAllCards;
  * @author David Perez Cabrera <dperezcabrera@gmail.com>
  */
 public class HandEvaluatorTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private static Properties properties;
 
@@ -80,55 +85,70 @@ public class HandEvaluatorTest {
     /**
      * Test of eval method, of class HandEvaluator.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEvalException() {
         System.out.println("evalException");
+        
         HandEvaluator instance = new HandEvaluator();
+        thrown.expect(IllegalArgumentException.class);
+         
         instance.eval(null);
     }
     
     /**
      * Test of eval method, of class HandEvaluator.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEvalException4Cards() {
         System.out.println("evalException4Cards");
+        
         HandEvaluator instance = new HandEvaluator();
         Card[] cards = CardUtil4Testing.fromStringCards("2C 3C 4C 5C");
+        thrown.expect(IllegalArgumentException.class);
+        
         instance.eval(cards);
     }
     
     /**
      * Test of eval method, of class HandEvaluator.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEvalException6Cards() {
         System.out.println("evalException6Cards");
+        
         HandEvaluator instance = new HandEvaluator();
         Card[] cards = CardUtil4Testing.fromStringCards("2C 3C 4C 5C 6C 7C");
+        thrown.expect(IllegalArgumentException.class);
         instance.eval(cards);
     }
     
     /**
      * Test of eval method, of class HandEvaluator.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEvalExceptionNullCard() {
         System.out.println("evalExceptionNullCard");
+        
         HandEvaluator instance = new HandEvaluator();
         Card[] cards = CardUtil4Testing.fromStringCards("2C 3C 4C 5C 6C");
         cards[3] = null;
+        thrown.expect(IllegalArgumentException.class);
+        
         instance.eval(cards);
     }
     
     /**
      * Test of eval method, of class HandEvaluator.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEvalExceptionRepeatCard() {
         System.out.println("evalExceptionRepeatCard");
+        
+        
         HandEvaluator instance = new HandEvaluator();
         Card[] cards = CardUtil4Testing.fromStringCards("2C 3C 4C 5C 3C");
+        thrown.expect(IllegalArgumentException.class);
+
         instance.eval(cards);
     }
     
@@ -156,7 +176,8 @@ public class HandEvaluatorTest {
     /**
      * Test of eval method, of class HandEvaluator.
      */
-    //@Test
+    @Ignore
+    @Test
     public void testEvalFullTesting() {
         System.out.println("evalFullTesting");
         HandEvaluator instance = new HandEvaluator();
@@ -185,11 +206,12 @@ public class HandEvaluatorTest {
     /**
      * Test of eval method, of class HandEvaluator.
      *
-     * @throws java.lang.InterruptedException
+     * @throws java.lang.Exception
      * @throws java.util.concurrent.ExecutionException
      */
-    //@Test
-    public void testEvalFullTestingThreads() throws InterruptedException, ExecutionException {
+    @Ignore
+    @Test
+    public void testEvalFullTestingThreads() throws Exception {
         System.out.println("evalFullTestingThreads");
         List<Card> deck = getAllCards();
         Combination combinatorial = new Combination(Hands.CARDS, deck.size());

@@ -98,9 +98,6 @@ public class TexasHoldEmTablePanel extends javax.swing.JPanel implements IStrate
     private int dealer = 0;
     private int round = 0;
 
-    public TexasHoldEmTablePanel() {
-    }
-
     public void setStrategy(IStrategy delegate) {
         this.delegate = delegate;
     }

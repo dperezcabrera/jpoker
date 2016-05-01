@@ -30,6 +30,7 @@ public class GameEvent {
     private Object payload;
 
     public GameEvent() {
+        // Default constructor
     }
 
     public GameEvent(String type, String source) {

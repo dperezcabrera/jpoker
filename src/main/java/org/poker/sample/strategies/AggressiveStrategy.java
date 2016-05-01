@@ -14,27 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package a.org.poker.main.strategies;
+package org.poker.sample.strategies;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.poker.api.game.BetCommand;
 import org.poker.api.game.GameInfo;
 import org.poker.api.game.IStrategy;
 import org.poker.api.game.PlayerInfo;
 import org.poker.api.game.TexasHoldEmUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
-public class SlowlyStrategy implements IStrategy {
+public class AggressiveStrategy implements IStrategy {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlowlyStrategy.class);
     private final String name;
 
-    public SlowlyStrategy(String name) {
-        this.name = "Slowly-" + name;
+    public AggressiveStrategy(String name) {
+        this.name = "Agresive-" + name;
     }
 
     @Override
@@ -45,15 +44,15 @@ public class SlowlyStrategy implements IStrategy {
     @Override
     public BetCommand getCommand(GameInfo<PlayerInfo> state) {
         try {
-            Thread.sleep(state.getSettings().getTime() + 500L);
-        } catch (InterruptedException ex) {
-            LOGGER.error("getCommand-Interrupted", ex);
+            Thread.sleep(20);
+        } catch (Exception ex) {
+            Logger.getLogger(AggressiveStrategy.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new BetCommand(TexasHoldEmUtil.BetCommandType.FOLD);
+        return new BetCommand(TexasHoldEmUtil.BetCommandType.ALL_IN);
     }
-    
+
     @Override
     public String toString() {
-        return String.join("{SlowlyStrategy-", name , "}");
+        return String.join("{AgresivePlayerStrategy-", name, "}");
     }
 }

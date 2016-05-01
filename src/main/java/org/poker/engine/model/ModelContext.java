@@ -34,15 +34,15 @@ import org.poker.api.game.TexasHoldEmUtil.GameState;
  */
 public class ModelContext {
 
-    private final GameInfo<PlayerEntity> gameInfo = new GameInfo<>();
-    private final Map<String, PlayerEntity> playersByName;
-    private int activePlayers;
-    private long highBet;
-    private Deck deck;
-    private int playersAllIn;
-    private BetCommand lastBetCommand;
-    private PlayerEntity lastPlayerBet;
-    private int bets = 0;
+    final GameInfo<PlayerEntity> gameInfo = new GameInfo<>();
+    final Map<String, PlayerEntity> playersByName;
+    int activePlayers;
+    long highBet;
+    Deck deck;
+    int playersAllIn;
+    BetCommand lastBetCommand;
+    PlayerEntity lastPlayerBet;
+    int bets = 0;
 
     public ModelContext(Settings settings) {
         this.gameInfo.setSettings(settings);

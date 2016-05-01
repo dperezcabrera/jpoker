@@ -37,7 +37,7 @@ public enum ImageManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageManager.class);
     
     public static final String IMAGES_PATH = "/images/";
-    private final Map<String, Image> images = new HashMap<>();
+    private final transient Map<String, Image> images = new HashMap<>();
 
     private ImageManager() {
     }

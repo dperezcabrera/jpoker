@@ -89,7 +89,7 @@ public class GameEventDispatcher<T> implements IGameEventDispatcher {
         while (!exit) {
             try {
                 doTask();
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("GameEventDispatcher<" + target.getClass() + ">.run(): " + target, ex);
             }
         }

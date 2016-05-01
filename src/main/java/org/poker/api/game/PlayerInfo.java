@@ -34,9 +34,6 @@ public class PlayerInfo {
     private PlayerState state;
     private int errors;
 
-    public PlayerInfo() {
-    }
-
     public boolean isActive() {
         return state.isActive();
     }

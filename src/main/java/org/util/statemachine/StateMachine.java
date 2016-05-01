@@ -35,9 +35,6 @@ public class StateMachine<T> {
     private final Map<String, IState<T>> defaultTransition = new HashMap<>();
     private final Map<String, List<Transition<T>>> transitions = new HashMap<>();
 
-    public StateMachine() {
-    }
-
     List<Transition<T>> getTransitionsByOrigin(IState<T> state) {
         List<Transition<T>> result = transitions.get(state.getName());
         if (result == null) {

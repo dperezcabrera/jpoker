@@ -64,16 +64,16 @@ public class GameController implements IGameController, Runnable {
     public static final String TIMEOUT_CONNECTOR_EVENT_TYPE = "timeOutCommand";
     public static final String CREATE_GAME_CONNECTOR_EVENT_TYPE = "createGame";
 
-    private final Map<String, IGameEventDispatcher> players = new HashMap<>();
-    private final List<String> playersByName = new ArrayList<>();
-    private final List<ExecutorService> subExecutors = new ArrayList<>();
-    private final Map<String, IGameEventProcessor<IStrategy>> playerProcessors;
-    private final GameEventDispatcher<StateMachineConnector> connectorDispatcher;
-    private final StateMachineConnector stateMachineConnector;
-    private final IGameTimer timer;
-    private Settings settings;
-    private ExecutorService executors;
-    private boolean finish;
+    final Map<String, IGameEventDispatcher> players = new HashMap<>();
+    final List<String> playersByName = new ArrayList<>();
+    final List<ExecutorService> subExecutors = new ArrayList<>();
+    final Map<String, IGameEventProcessor<IStrategy>> playerProcessors;
+    final GameEventDispatcher<StateMachineConnector> connectorDispatcher;
+    final StateMachineConnector stateMachineConnector;
+    final IGameTimer timer;
+    Settings settings;
+    ExecutorService executors;
+    boolean finish;
 
     public GameController() {
         timer = new GameTimer(SYSTEM_CONTROLLER, buildExecutor(DISPATCHER_THREADS));
@@ -174,7 +174,7 @@ public class GameController implements IGameController, Runnable {
         subExecutors.stream().forEach(ExecutorService::shutdown);
         try {
             executors.awaitTermination(0, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Error intentando eliminar cerrar todos los hilos", ex);
         }
         finish = true;
@@ -186,7 +186,7 @@ public class GameController implements IGameController, Runnable {
         if (!finish) {
             try {
                 wait();
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("Esperando el final del juego", ex);
             }
         }

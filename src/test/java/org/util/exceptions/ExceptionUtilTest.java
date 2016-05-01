@@ -16,8 +16,9 @@
  */
 package org.util.exceptions;
 
-import org.util.exceptions.ExceptionUtil;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -25,14 +26,20 @@ import org.junit.Test;
  */
 public class ExceptionUtilTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     /**
      * Test of checkNullArgument method, of class ExceptionUtil.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckNullArgument() {
         System.out.println("checkNullArgument");
+
         Object o = null;
         String name = "";
+        thrown.expect(IllegalArgumentException.class);
+
         ExceptionUtil.checkNullArgument(o, name);
     }
 
@@ -49,24 +56,28 @@ public class ExceptionUtilTest {
     /**
      * Test of checkArrayLengthArgument method, of class ExceptionUtil.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckArrayLengthArgument() {
         System.out.println("checkArrayLengthArgument");
+
         Object[] a = null;
         String name = "";
         int length = 5;
+        thrown.expect(IllegalArgumentException.class);
         ExceptionUtil.checkArrayLengthArgument(a, name, length);
     }
 
     /**
      * Test of checkArrayLengthArgument method, of class ExceptionUtil.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckArrayLengthArgumentWrongLength() {
         System.out.println("checkArrayLengthArgument");
         int length = 5;
-        Object[] a = new Object[length+1];
+        Object[] a = new Object[length + 1];
         String name = "";
+        thrown.expect(IllegalArgumentException.class);
+
         ExceptionUtil.checkArrayLengthArgument(a, name, length);
     }
 
@@ -82,15 +93,16 @@ public class ExceptionUtilTest {
         ExceptionUtil.checkArgument(throwException, message, args);
     }
 
-    
     /**
      * Test of checkArgument method, of class ExceptionUtil.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckArgumentThrow() {
         System.out.println("checkArgument");
         boolean throwException = true;
         String message = "error";
+        thrown.expect(IllegalArgumentException.class);
+
         ExceptionUtil.checkArgument(throwException, message);
     }
 }

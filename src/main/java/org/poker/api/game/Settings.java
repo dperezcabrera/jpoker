@@ -34,6 +34,7 @@ public class Settings {
     private int rounds4IncrementBlind;
 
     public Settings() {
+        // Default constructor.
     }
 
     public Settings(Settings s) {

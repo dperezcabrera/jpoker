@@ -24,7 +24,6 @@ import org.poker.api.game.Settings;
 import org.poker.api.game.TexasHoldEmUtil;
 import org.poker.dispatcher.GameEvent;
 import org.poker.dispatcher.IGameEventDispatcher;
-import static org.poker.engine.controller.GameController.SYSTEM_CONTROLLER;
 import org.poker.engine.model.ModelContext;
 import org.poker.engine.model.ModelUtil;
 import org.poker.engine.states.BetRoundState;
@@ -40,6 +39,7 @@ import org.util.statemachine.StateDecoratorBuilder;
 import org.util.statemachine.StateMachine;
 import org.util.statemachine.StateMachineInstance;
 import org.util.timer.IGameTimer;
+import static org.poker.engine.controller.GameController.SYSTEM_CONTROLLER;
 
 /**
  *
@@ -132,18 +132,16 @@ public class StateMachineConnector {
         String playerTurn = model.getLastPlayerBet().getName();
         BetCommand lbc = model.getLastBetCommand();
         LOGGER.debug("notifyBetCommand -> {}: {}", playerTurn, lbc);
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, playerTurn, new BetCommand(lbc.getType(), lbc.getChips())));
-        }
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                        new GameEvent(GameController.BET_COMMAND_EVENT_TYPE, playerTurn, new BetCommand(lbc.getType(), lbc.getChips()))));
     }
 
     private void notifyCheck() {
         LOGGER.debug("notifyCheck: {}", GameController.CHECK_PLAYER_EVENT_TYPE, model.getCommunityCards());
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(GameController.CHECK_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, model.getCommunityCards()));
-        }
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                        new GameEvent(GameController.CHECK_PLAYER_EVENT_TYPE, SYSTEM_CONTROLLER, model.getCommunityCards())));
     }
 
     private void notifyPlayerTurn() {
@@ -160,7 +158,7 @@ public class StateMachineConnector {
         notifyEvent(GameController.END_HAND_PLAYER_EVENT_TYPE);
         try {
             Thread.sleep(END_HAND_SLEEP_TIME);
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Error en la espera despues de terminar una mano.", ex);
         }
     }
@@ -173,10 +171,9 @@ public class StateMachineConnector {
 
     private void notifyEvent(String type) {
         LOGGER.debug("notifyEvent: {} -> {}", type, model);
-        for (String playerName : playersDispatcher.keySet()) {
-            playersDispatcher.get(playerName).dispatch(
-                    new GameEvent(type, SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, playerName)));
-        }
+        playersDispatcher.entrySet().stream().forEach(entry
+                -> entry.getValue().dispatch(
+                        new GameEvent(type, SYSTEM_CONTROLLER, PlayerAdapter.toTableState(model, entry.getKey()))));
     }
 
     private StateMachine<ModelContext> buildStateMachine() {
@@ -204,7 +201,7 @@ public class StateMachineConnector {
 
         // checkState transitions
         sm.addTransition(checkState, showDownState, c -> c.getGameState() == TexasHoldEmUtil.GameState.SHOWDOWN);
-        sm.addTransition(checkState, betRoundState,  c -> c.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
+        sm.addTransition(checkState, betRoundState, c -> c.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
         sm.setDefaultTransition(checkState, checkState);
 
         // betWinnerState transitions

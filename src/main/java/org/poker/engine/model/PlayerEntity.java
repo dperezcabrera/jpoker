@@ -29,9 +29,6 @@ public class PlayerEntity extends PlayerInfo {
     private int handValue = 0;
     private BetCommand betCommand;
     private boolean showCards;
-
-    public PlayerEntity() {
-    }
     
     public boolean showCards() {
         return showCards;

@@ -14,25 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package z.org.poker.ejemplo14;
+package org.poker.sample.strategies;
 
-import org.poker.api.core.Card;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.poker.api.game.BetCommand;
+import org.poker.api.game.GameInfo;
+import org.poker.api.game.IStrategy;
+import org.poker.api.game.PlayerInfo;
+import org.poker.api.game.TexasHoldEmUtil;
 
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
-public final class Main {
+public class FoldStrategy implements IStrategy {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private final String name;
 
-    private Main() {
+    public FoldStrategy(String name) {
+        this.name = "Fold-" + name;
     }
 
-    public static void main(String[] args) {
-        Card card = new Card(Card.Suit.CLUB, Card.Rank.ACE);
-        LOGGER.info("As de treboles: {}", card);
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public BetCommand getCommand(GameInfo<PlayerInfo> state) {
+        return new BetCommand(TexasHoldEmUtil.BetCommandType.FOLD);
+    }
+
+    @Override
+    public String toString() {
+        return String.join("{Fold-", name, "}");
     }
 }

@@ -87,7 +87,7 @@ public class GameTimer implements IGameTimer {
         while (!exit) {
             try {
                 doTask();
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("Timer interrupted", ex);
             }
         }
@@ -102,8 +102,7 @@ public class GameTimer implements IGameTimer {
             reset = false;
             wait(time);
             if (!reset && timeoutId != null) {
-                GameEvent event = new GameEvent(TIMEOUT_EVENT_TYPE, source, timeoutId);
-                executors.execute(() -> dispatcher.dispatch(event));
+                executors.execute(() -> dispatcher.dispatch(new GameEvent(TIMEOUT_EVENT_TYPE, source, timeoutId)));
                 timeoutId = null;
             }
         }

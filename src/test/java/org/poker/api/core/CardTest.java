@@ -23,6 +23,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import static org.poker.api.core.Deck.getAllCards;
 
 /**
@@ -30,6 +32,9 @@ import static org.poker.api.core.Deck.getAllCards;
  * @author David Perez Cabrera <dperezcabrera@gmail.com>
  */
 public class CardTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testContructorGetSuit() {
@@ -49,19 +54,25 @@ public class CardTest {
         assertEquals(expRank, rankResult);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testContructorSuitNull() {
         System.out.println("card(SuitNull)");
+        
         Card.Suit expSuit = null;
         Card.Rank expRank = Card.Rank.TWO;
+        thrown.expect(IllegalArgumentException.class);
+        
         Card instance = new Card(expSuit, expRank);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testContructorRankNull() {
+        
         System.out.println("card(RankNull)");
         Card.Suit expSuit = Card.Suit.CLUB;
         Card.Rank expRank = null;
+        thrown.expect(IllegalArgumentException.class);
+        
         Card instance = new Card(expSuit, expRank);
     }
 

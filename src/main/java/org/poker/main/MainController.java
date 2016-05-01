@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package a.org.poker.main;
+package org.poker.main;
 
-import a.org.poker.main.strategies.RandomStrategy;
+import org.poker.sample.strategies.RandomStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.poker.api.game.GameException;
 import org.poker.api.game.IGameController;
 import org.poker.api.game.IStrategy;
 import org.poker.api.game.Settings;
@@ -38,7 +37,7 @@ public final class MainController {
     private MainController() {
     }
 
-    public static void main(String[] args) throws InterruptedException, GameException {
+    public static void main(String[] args) throws Exception {
         IStrategy strategyMain = new RandomStrategy("0");
         TexasHoldEmView texasHoldEmView = new TexasHoldEmView(strategyMain);
         texasHoldEmView.setVisible(true);

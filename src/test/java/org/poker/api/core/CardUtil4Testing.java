@@ -40,7 +40,6 @@ public final class CardUtil4Testing {
         Card result = null;
         if (s != null) {
             result = STRING_TO_CARD.get(s);
-            ExceptionUtil.checkArgument(result == null, "s", ARGUMENTO_NO_VALIDO, s);
         }
         return result;
     }
@@ -50,9 +49,7 @@ public final class CardUtil4Testing {
         Card[] result = new Card[st.countTokens()];
         int i = 0;
         while (st.hasMoreTokens()) {
-            Card c = fromString(st.nextToken());
-            ExceptionUtil.checkArgument(c == null, "s", ARGUMENTO_NO_VALIDO, s);
-            result[i++] = c;
+            result[i++] = fromString(st.nextToken());
         }
         return result;
     }
