@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@ package org.util.timer;
 
 import java.util.concurrent.ExecutorService;
 import net.jcip.annotations.ThreadSafe;
-import org.poker.dispatcher.GameEvent;
-import org.poker.dispatcher.IGameEventDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,29 +29,21 @@ import org.slf4j.LoggerFactory;
 public class GameTimer implements IGameTimer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameTimer.class);
-    public static final String TIMEOUT_EVENT_TYPE = "timeOutCommand";
 
-    private final String source;
     private long time;
-    private IGameEventDispatcher dispatcher;
+    private TimeoutNotifier notifier;
     private boolean reset = false;
     private volatile boolean exit = false;
     private final ExecutorService executors;
     private Long timeoutId;
 
-    public GameTimer(String source, ExecutorService executors) {
-        this.source = source;
+    public GameTimer(ExecutorService executors) {
         this.executors = executors;
     }
 
     @Override
-    public synchronized IGameEventDispatcher getDispatcher() {
-        return dispatcher;
-    }
-
-    @Override
-    public synchronized void setDispatcher(IGameEventDispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+    public void setNotifier(TimeoutNotifier notifier) {
+        this.notifier = notifier;
     }
 
     @Override
@@ -67,7 +57,7 @@ public class GameTimer implements IGameTimer {
     }
 
     @Override
-    public synchronized void resetTimer(Long timeoutId) {
+    public synchronized void changeTimeoutId(Long timeoutId) {
         this.timeoutId = timeoutId;
         this.reset = true;
         notify();
@@ -102,7 +92,8 @@ public class GameTimer implements IGameTimer {
             reset = false;
             wait(time);
             if (!reset && timeoutId != null) {
-                executors.execute(() -> dispatcher.dispatch(new GameEvent(TIMEOUT_EVENT_TYPE, source, timeoutId)));
+                final Long timeoutToNotify = timeoutId;
+                executors.execute(() -> notifier.notify(timeoutToNotify));
                 timeoutId = null;
             }
         }

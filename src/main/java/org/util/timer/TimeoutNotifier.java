@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,15 +20,8 @@ package org.util.timer;
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  */
-public interface IGameTimer extends Runnable {
+@FunctionalInterface
+public interface TimeoutNotifier {
 
-    public void exit();
-
-    public long getTime();
-
-    public void changeTimeoutId(Long timeoutId);
-
-    public void setTime(long time);
-
-    public void setNotifier(TimeoutNotifier notifier);
+    public void notify(Long timeoutId);
 }
