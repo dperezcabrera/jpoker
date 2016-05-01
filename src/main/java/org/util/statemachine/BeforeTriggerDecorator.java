@@ -16,35 +16,33 @@
  */
 package org.util.statemachine;
 
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  * @since 1.0.0
  * 
- * @param <S>
  * @param <T>
  */
-public class Transition<S extends Enum, T> {
+@NotThreadSafe
+public class BeforeTriggerDecorator<T> implements IStateTrigger<T> {
 
-    private final S origin;
-    private final S target;
-    private final IChecker<T> checker;
+    private final IStateTrigger<T> trigger;
+    private final Runnable listener;
+    private boolean executed = true;
 
-    public Transition(S origin, S target, IChecker<T> checker) {
-        this.origin = origin;
-        this.target = target;
-        this.checker = checker;
+    public BeforeTriggerDecorator(IStateTrigger<T> state, Runnable listener) {
+        this.trigger = state;
+        this.listener = listener;
     }
 
-    public S getOrigin() {
-        return origin;
-    }
-
-    public S getTarget() {
-        return target;
-    }
-
-    public IChecker<T> getChecker() {
-        return checker;
+    @Override
+    public boolean execute(T context) {
+        if (executed) {
+            listener.run();
+        }
+        executed = trigger.execute(context);
+        return executed;
     }
 }

@@ -21,30 +21,10 @@ package org.util.statemachine;
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  * @since 1.0.0
  * 
- * @param <S>
  * @param <T>
  */
-public class Transition<S extends Enum, T> {
+@FunctionalInterface
+public interface IStateTrigger<T> {
 
-    private final S origin;
-    private final S target;
-    private final IChecker<T> checker;
-
-    public Transition(S origin, S target, IChecker<T> checker) {
-        this.origin = origin;
-        this.target = target;
-        this.checker = checker;
-    }
-
-    public S getOrigin() {
-        return origin;
-    }
-
-    public S getTarget() {
-        return target;
-    }
-
-    public IChecker<T> getChecker() {
-        return checker;
-    }
+    public boolean execute(T context);
 }

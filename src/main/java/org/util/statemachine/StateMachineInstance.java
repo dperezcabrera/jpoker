@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 David Perez Cabrera
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,22 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
+ * 
+ * @param <S>
  * @param <T>
  */
 @NotThreadSafe
-public class StateMachineInstance<T> {
+public class StateMachineInstance<S extends Enum, T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachineInstance.class);
     private final T context;
-    private final StateMachine<T> parent;
-    private IState<T> state;
+    private final StateMachine<S, T> parent;
+    private S state;
     private boolean finish;
     private boolean pause;
 
-    public StateMachineInstance(T context, StateMachine<T> parent, IState<T> state) {
+    public StateMachineInstance(T context, StateMachine<S, T> parent, S state) {
         this.context = context;
         this.parent = parent;
         this.state = state;
@@ -46,7 +49,7 @@ public class StateMachineInstance<T> {
         return finish;
     }
 
-    public StateMachineInstance<T> execute() {
+    public StateMachineInstance<S, T> execute() {
         this.pause = false;
         while (state != null && !pause) {
             state = executeState();
@@ -62,20 +65,20 @@ public class StateMachineInstance<T> {
         return context;
     }
 
-    private IState<T> executeState() {
-        LOGGER.debug("state \"{}\" executing...", state.getName());
-        pause = !state.execute(context);
-        IState<T> result = state;
+    private S executeState() {
+        LOGGER.debug("state \"{}\" executing...", state);
+        pause = !parent.getTrigger(state).execute(context);
+        S result = state;
         if (!pause) {
-            LOGGER.debug("state \"{}\" [executed]", state.getName());
-            for (Transition<T> transition : parent.getTransitionsByOrigin(state)) {
+            LOGGER.debug("state \"{}\" [executed]", state);
+            for (Transition<S, T> transition : parent.getTransitionsByOrigin(state)) {
                 if (transition.getChecker().check(context)) {
                     return transition.getTarget();
                 }
             }
             result = parent.getDefaultTransition(state);
         } else {
-            LOGGER.debug("state \"{}\"  [paused]", state.getName());
+            LOGGER.debug("state \"{}\"  [paused]", state);
         }
         return result;
     }

@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+/* 
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,40 +21,42 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
+ * @since 1.0.0
+ * 
  * @param <T>
  */
 @NotThreadSafe
 public class StateDecoratorBuilder<T> {
 
-    private IState<T> state;
+    private IStateTrigger<T> trigger;
 
-    private StateDecoratorBuilder(IState<T> state) {
-        this.state = state;
+    private StateDecoratorBuilder(IStateTrigger<T> state) {
+        this.trigger = state;
     }
 
-    public static <T> StateDecoratorBuilder<T> create(IState<T> state) {
+    public static <T> StateDecoratorBuilder<T> create(IStateTrigger<T> state) {
         return new StateDecoratorBuilder<>(state);
     }
 
     public StateDecoratorBuilder<T> after(Runnable r) {
-        this.state = new AfterStateDecorator<>(state, r);
+        this.trigger = new AfterTriggerDecorator<>(trigger, r);
         return this;
     }
 
     public StateDecoratorBuilder<T> before(Runnable r) {
-        this.state = new BeforeStateDecorator<>(state, r);
+        this.trigger = new BeforeTriggerDecorator<>(trigger, r);
         return this;
     }
 
-    public IState<T> build() {
-        return state;
+    public IStateTrigger<T> build() {
+        return trigger;
     }
 
-    public static <T> IState<T> after(IState<T> state, Runnable r) {
-        return new AfterStateDecorator<>(state, r);
+    public static <T> IStateTrigger<T> after(IStateTrigger<T> state, Runnable r) {
+        return new AfterTriggerDecorator<>(state, r);
     }
 
-    public static <T> IState<T> before(IState<T> state, Runnable r) {
-        return new BeforeStateDecorator<>(state, r);
+    public static <T> IStateTrigger<T> before(IStateTrigger<T> state, Runnable r) {
+        return new BeforeTriggerDecorator<>(state, r);
     }
 }
