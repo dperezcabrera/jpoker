@@ -19,7 +19,7 @@
         <logback.version>1.1.2</logback.version>
         <jcip.verion>1.0</jcip.verion>
         <spring.version>4.2.5.RELEASE</spring.version>
-        <main.class>a.org.poker.main.MainController</main.class>
+        <main.class>org.poker.main.MainController</main.class>
     </properties>
     <scm>
         <url>https://github.com/dperezcabrera/jpoker</url>
