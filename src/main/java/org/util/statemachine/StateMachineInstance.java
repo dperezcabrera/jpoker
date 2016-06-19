@@ -76,7 +76,7 @@ public class StateMachineInstance<S extends Enum, T> {
                     return transition.getTarget();
                 }
             }
-            result = parent.getDefaultTransition(state);
+            result = null;
         } else {
             LOGGER.debug("state \"{}\"  [paused]", state);
         }

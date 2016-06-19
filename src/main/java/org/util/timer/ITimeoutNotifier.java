@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 David Pérez Cabrera <dperezcabrera@gmail.com>
+ * Copyright (C) 2016 David Pérez Cabrera <dperezcabrera@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,37 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.util.statemachine;
-
-import net.jcip.annotations.NotThreadSafe;
+package org.util.timer;
 
 /**
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
- * @param <T>
+ * @since 2.0.0
  */
-@NotThreadSafe
-public class AfterStateDecorator<T> implements IState<T> {
+@FunctionalInterface
+public interface ITimeoutNotifier {
 
-    private final IState<T> state;
-    private final Runnable listener;
-
-    public AfterStateDecorator(IState<T> state, Runnable listener) {
-        this.state = state;
-        this.listener = listener;
-    }
-
-    @Override
-    public String getName() {
-        return state.getName();
-    }
-
-    @Override
-    public boolean execute(T context) {
-        boolean result = state.execute(context);
-        if (result) {
-            listener.run();
-        }
-        return result;
-    }
+    public void notify(Long timeoutId);
 }

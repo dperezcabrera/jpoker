@@ -40,6 +40,7 @@ import org.util.statemachine.StateMachine;
 import org.util.statemachine.StateMachineInstance;
 import org.util.timer.IGameTimer;
 import org.util.statemachine.IStateTrigger;
+import org.util.statemachine.StateMachineBuilder;
 
 /**
  *
@@ -47,6 +48,7 @@ import org.util.statemachine.IStateTrigger;
  * @since 1.0.0d
  */
 public class StateMachineConnector {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachineConnector.class);
 
     private final StateMachine<PokerStates, ModelContext> texasStateMachine = buildStateMachine();
@@ -129,7 +131,7 @@ public class StateMachineConnector {
         LOGGER.debug("notifyBetCommand -> {}: {}", playerTurn, lbc);
         playersDispatcher.entrySet().stream().forEach(entry
                 -> entry.getValue().dispatch(
-                    new GameEvent<>(PokerEventType.BET_COMMAND, playerTurn, new BetCommand(lbc.getType(), lbc.getChips()))));
+                        new GameEvent<>(PokerEventType.BET_COMMAND, playerTurn, new BetCommand(lbc.getType(), lbc.getChips()))));
     }
 
     private void notifyCheck() {
@@ -175,7 +177,6 @@ public class StateMachineConnector {
     }
 
     private StateMachine<PokerStates, ModelContext> buildStateMachine() {
-        StateMachine<PokerStates, ModelContext> sm = new StateMachine<>();
         final IStateTrigger<ModelContext> initHandTrigger = StateDecoratorBuilder.after(new InitHandTrigger(), () -> notifyInitHand());
         final IStateTrigger<ModelContext> betRoundTrigger = StateDecoratorBuilder
                 .create(new BetRoundTrigger())
@@ -188,39 +189,27 @@ public class StateMachineConnector {
         final IStateTrigger<ModelContext> endHandTrigger = StateDecoratorBuilder.before(new EndHandTrigger(), () -> notifyEndHand());
         final IStateTrigger<ModelContext> endGameTrigger = StateDecoratorBuilder.after(new EndGameTrigger(), () -> notifyEndGame());
 
-        sm.setTrigger(PokerStates.INIT_HAND, initHandTrigger);
-        sm.setTrigger(PokerStates.BET_ROUND, betRoundTrigger);
-        sm.setTrigger(PokerStates.CHECK, checkTrigger);
-        sm.setTrigger(PokerStates.WINNER, winnerTrigger);
-        sm.setTrigger(PokerStates.SHOWDOWN, showDownTrigger);
-        sm.setTrigger(PokerStates.END_HAND, endHandTrigger);
-        sm.setTrigger(PokerStates.END_GAME, endGameTrigger);
-        
-        
-        sm.setInitState(PokerStates.INIT_HAND);
-
-        // init hand state transitions
-        sm.setDefaultTransition(PokerStates.INIT_HAND, PokerStates.BET_ROUND);
-
-        // bet round state transitions
-        sm.addTransition(PokerStates.BET_ROUND, PokerStates.BET_ROUND, m -> m.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
-        sm.addTransition(PokerStates.BET_ROUND, PokerStates.WINNER, m -> m.getPlayersAllIn() + m.getActivePlayers() == 1);
-        sm.setDefaultTransition(PokerStates.BET_ROUND, PokerStates.CHECK);
-
-        // check state transitions
-        sm.addTransition(PokerStates.CHECK, PokerStates.SHOWDOWN, m -> m.getGameState() == TexasHoldEmUtil.GameState.SHOWDOWN);
-        sm.addTransition(PokerStates.CHECK, PokerStates.BET_ROUND, m -> m.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN);
-        sm.setDefaultTransition(PokerStates.CHECK, PokerStates.CHECK);
-
-        // winner state transitions
-        sm.setDefaultTransition(PokerStates.WINNER, PokerStates.END_HAND);
-
-        // showdown state transitions
-        sm.setDefaultTransition(PokerStates.SHOWDOWN, PokerStates.END_HAND);
-
-        // end hand state transitions
-        sm.addTransition(PokerStates.END_HAND, PokerStates.INIT_HAND, m -> m.getNumPlayers() > 1 && m.getRound() < m.getSettings().getMaxRounds());
-        sm.setDefaultTransition(PokerStates.END_HAND, PokerStates.END_GAME);
-        return sm;
+        return StateMachineBuilder.create(PokerStates.class, ModelContext.class)
+                .initState(PokerStates.INIT_HAND)
+                .stateTrigger(PokerStates.INIT_HAND, initHandTrigger)
+                .stateTrigger(PokerStates.BET_ROUND, betRoundTrigger)
+                .stateTrigger(PokerStates.CHECK, checkTrigger)
+                .stateTrigger(PokerStates.WINNER, winnerTrigger)
+                .stateTrigger(PokerStates.SHOWDOWN, showDownTrigger)
+                .stateTrigger(PokerStates.END_HAND, endHandTrigger)
+                .stateTrigger(PokerStates.END_GAME, endGameTrigger)
+                .stateTrigger(PokerStates.CHECK, checkTrigger)
+                
+                .transition(PokerStates.INIT_HAND, PokerStates.BET_ROUND)
+                .transition(PokerStates.BET_ROUND, PokerStates.BET_ROUND, m -> m.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN)
+                .transition(PokerStates.BET_ROUND, PokerStates.WINNER, m -> m.getPlayersAllIn() + m.getActivePlayers() == 1)
+                .transition(PokerStates.BET_ROUND, PokerStates.CHECK)
+                .transition(PokerStates.CHECK, PokerStates.SHOWDOWN, m -> m.getGameState() == TexasHoldEmUtil.GameState.SHOWDOWN)
+                .transition(PokerStates.CHECK, PokerStates.BET_ROUND, m -> m.getPlayerTurn() != ModelUtil.NO_PLAYER_TURN)
+                .transition(PokerStates.CHECK, PokerStates.CHECK)
+                .transition(PokerStates.WINNER, PokerStates.END_HAND)
+                .transition(PokerStates.SHOWDOWN, PokerStates.END_HAND)
+                .transition(PokerStates.END_HAND, PokerStates.INIT_HAND, m -> m.getNumPlayers() > 1 && m.getRound() < m.getSettings().getMaxRounds())
+                .transition(PokerStates.END_HAND, PokerStates.END_GAME).build();
     }
 }

@@ -20,6 +20,9 @@ package org.poker.dispatcher;
  *
  * @author David Pérez Cabrera <dperezcabrera@gmail.com>
  * @since 1.0.0
+ * 
+ * @param <E>
+ * @param <T>
  */
 @FunctionalInterface
 public interface IGameEventProcessor<E extends Enum, T> {
