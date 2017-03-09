@@ -6,3 +6,5 @@
 # JPoker
 
 A simple poker game with gui.
+
+[Manual](http://www.javahispano.org/portada/2015/2/2/nuevo-tutorial-desarrollando-con-java-8.html)
