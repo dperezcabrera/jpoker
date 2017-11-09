@@ -58,12 +58,12 @@ public class BetRoundTrigger implements IStateTrigger<ModelContext> {
 
         result.put(BetCommandType.CALL, (c, p, b) -> {
             b.setChips(c.getHighBet() - p.getBet());
-            return c.getHighBet() > c.getSettings().getBigBind();
+            return c.getHighBet() > c.getSettings().getBigBlind();
         });
 
         result.put(BetCommandType.CHECK, (c, p, b) -> {
             b.setChips(c.getHighBet() - p.getBet());
-            return b.getChips() == 0 || c.getHighBet() == c.getSettings().getBigBind();
+            return b.getChips() == 0 || c.getHighBet() == c.getSettings().getBigBlind();
         });
         return result;
     }

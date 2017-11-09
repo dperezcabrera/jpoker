@@ -62,7 +62,7 @@ public class RandomStrategy implements IStrategy {
         calcAggressivity(state, ownInfo);
         long otherPlayerMaxBet = state.getPlayers().stream().max((p0, p1) -> Long.compare(p0.getBet(), p1.getBet())).get().getBet();
 
-        long minBet = Math.max(otherPlayerMaxBet - ownInfo.getBet(), state.getSettings().getBigBind());
+        long minBet = Math.max(otherPlayerMaxBet - ownInfo.getBet(), state.getSettings().getBigBlind());
         long maxBet = getMaxBet(state);
         long chips = ownInfo.getChips();
         BetCommand result;
@@ -73,7 +73,7 @@ public class RandomStrategy implements IStrategy {
             result = new BetCommand(BetCommandType.ALL_IN);
         } else if (maxBet > minBet && (lastBet == null || lastBet.getType() != BetCommandType.RAISE)) {
             result = new BetCommand(BetCommandType.RAISE, maxBet);
-        } else if (minBet == 0 || otherPlayerMaxBet == state.getSettings().getBigBind()) {
+        } else if (minBet == 0 || otherPlayerMaxBet == state.getSettings().getBigBlind()) {
             result = new BetCommand(BetCommandType.CHECK);
         } else {
             result = new BetCommand(BetCommandType.CALL);

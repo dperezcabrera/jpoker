@@ -47,7 +47,7 @@ public class InitHandTrigger implements IStateTrigger<ModelContext> {
         model.clearCommunityCard();
         model.setRound(model.getRound() + 1);
         if (model.getRound() % settings.getRounds4IncrementBlind() == 0) {
-            settings.setSmallBind(2 * settings.getSmallBind());
+            settings.setSmallBlind(2 * settings.getSmallBlind());
         }
         model.setPlayersAllIn(0);
         model.setHighBet(0L);
@@ -68,9 +68,9 @@ public class InitHandTrigger implements IStateTrigger<ModelContext> {
         model.setDealer(dealerIndex);
         model.setPlayerTurn((dealerIndex + 1) % numPlayers);
         if (numPlayers > MIN_PLAYERS) {
-            compulsoryBet(model, settings.getSmallBind());
+            compulsoryBet(model, settings.getSmallBlind());
         }
-        compulsoryBet(model, settings.getBigBind());
+        compulsoryBet(model, settings.getBigBlind());
         return true;
     }
 

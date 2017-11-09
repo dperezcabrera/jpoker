@@ -59,7 +59,7 @@ public final class MainController {
             settings.setTime(500);
             settings.setPlayerChip(5000L);
             settings.setRounds4IncrementBlind(20);
-            settings.setSmallBind(settings.getPlayerChip() / 100);
+            settings.setSmallBlind(settings.getPlayerChip() / 100);
             IGameController controller = new GameController();
             controller.setSettings(settings);
             for (IStrategy strategy : strategies) {

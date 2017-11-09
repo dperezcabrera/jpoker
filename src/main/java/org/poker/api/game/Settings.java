@@ -33,7 +33,7 @@ public class Settings implements Serializable{
     private int maxErrors;
     private int maxRounds;
     private long playerChip;
-    private long smallBind;
+    private long smallBlind;
     private int rounds4IncrementBlind;
 
     public Settings() {
@@ -45,7 +45,7 @@ public class Settings implements Serializable{
         this.time = s.time;
         this.maxErrors = s.maxErrors;
         this.playerChip = s.playerChip;
-        this.smallBind = s.smallBind;
+        this.smallBlind = s.smallBlind;
         this.maxRounds = s.maxRounds;
         this.rounds4IncrementBlind = s.rounds4IncrementBlind;
     }
@@ -82,16 +82,16 @@ public class Settings implements Serializable{
         this.playerChip = playerChip;
     }
 
-    public long getSmallBind() {
-        return smallBind;
+    public long getSmallBlind() {
+        return smallBlind;
     }
 
-    public long getBigBind() {
-        return smallBind * 2;
+    public long getBigBlind() {
+        return smallBlind * 2;
     }
 
-    public void setSmallBind(long smallBind) {
-        this.smallBind = smallBind;
+    public void setSmallBlind(long smallBlind) {
+        this.smallBlind = smallBlind;
     }
 
     public int getMaxRounds() {
@@ -112,6 +112,6 @@ public class Settings implements Serializable{
 
     @Override
     public String toString() {
-        return "{class:'Settings', maxPlayers:" + maxPlayers + ", time:" + time + ", maxErrors:" + maxErrors + ", playerChip:" + playerChip + ", maxRounds:" + maxRounds + ", smallBind:" + smallBind + ", rounds4IncrementBlind:" + rounds4IncrementBlind + '}';
+        return "{class:'Settings', maxPlayers:" + maxPlayers + ", time:" + time + ", maxErrors:" + maxErrors + ", playerChip:" + playerChip + ", maxRounds:" + maxRounds + ", smallBlind:" + smallBlind + ", rounds4IncrementBlind:" + rounds4IncrementBlind + '}';
     }
 }

@@ -139,7 +139,7 @@ public class GameController implements IGameController, Runnable {
         check(settings.getRounds4IncrementBlind() > 1, "El número de rondas hasta incrementar las ciegas debe ser mayor que '1'.");
         check(settings.getTime() > 0, "El tiempo máximo por jugador debe ser mayor que '0' y se indica en ms.");
         check(settings.getPlayerChip() > 0, "El número de fichas inicial por jugador debe ser mayor que '0', el valor recomendado es 5000.");
-        check(settings.getSmallBind() > 0, "La apuesta de la ciega pequeña debe ser mayor que '0' idealmente es la centesima parte de las fichas iniciales por jugador.");
+        check(settings.getSmallBlind() > 0, "La apuesta de la ciega pequeña debe ser mayor que '0' idealmente es la centesima parte de las fichas iniciales por jugador.");
         executors = Executors.newFixedThreadPool(players.size() + EXTRA_THREADS);
         players.values().stream().forEach(executors::execute);
         stateMachineConnector.createGame(settings);
