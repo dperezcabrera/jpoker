@@ -8,3 +8,6 @@
 A simple poker game with gui.
 
 [Manual](http://www.javahispano.org/portada/2015/2/2/nuevo-tutorial-desarrollando-con-java-8.html)
+
+[Manual mobi](https://github.com/dperezcabrera/jpoker/blob/master/Desarrollando%20con%20Java%208:%20Poker.mobi)
+[Manual epub](https://github.com/dperezcabrera/jpoker/blob/master/Desarrollando%20con%20Java%208:%20Poker.epub)
