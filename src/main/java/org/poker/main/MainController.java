@@ -67,7 +67,6 @@ public final class MainController {
             }
             controller.start();
             controller.waitFinish();
-            controller.waitFinish();
             LOGGER.info("scores: {}", controller.getScores());
             Thread.sleep(1000);
         }
